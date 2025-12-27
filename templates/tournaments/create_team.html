@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}สร้างทีม - สมัคร {{ tournament.name }}{% endblock %}
+
+{% block content %}
+<div style="max-width:700px;margin:40px auto;padding:24px;background:rgba(15,18,35,0.85);border-radius:12px;color:#fff">
+  <h2 style="margin-bottom:10px">สร้างทีมใหม่</h2>
+  <p style="color:#9fb6ff;margin-bottom:18px">คุณกำลังสมัครเข้าร่วม <strong>{{ tournament.name }}</strong>. สร้างทีมใหม่เพื่อเป็นหัวหน้าทีม</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <div style="margin-bottom:12px">
+      <label style="display:block;color:#cbd6ef;margin-bottom:6px">ชื่อทีม</label>
+      <input name="team_name" required style="width:100%;padding:10px;border-radius:8px;border:none;background:#0f1230;color:#fff">
+    </div>
+
+    <div style="text-align:right;margin-top:18px">
+      <button class="btn btn-primary" type="submit" style="width:200px">สร้างทีมและสมัคร</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

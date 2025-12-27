@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}สมัครแข่งขัน - {{ tournament.name }}{% endblock %}
+
+{% block content %}
+<div style="max-width:900px;margin:40px auto;padding:24px;background:rgba(15,18,35,0.8);border-radius:12px;color:#fff">
+  <a href="javascript:history.back()" style="color:#9fb6ff;display:inline-block;margin-bottom:12px">ย้อนกลับ</a>
+  <h2 style="margin-bottom:6px">สมัครแข่งขัน</h2>
+  <p style="color:#b8c6df;margin-bottom:18px">กิจกรรม : {{ tournament.name }}<br>
+  วันที่แข่งขัน : {{ tournament.start_date|date:"j F Y" }}</p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div style="color:#cfdff8">รายละเอียด:<br>{{ tournament.featured_description|default:tournament.description }}</div>
+    <div style="text-align:right;color:#cfdff8">รูปแบบ : {{ tournament.rules|default:'-' }}</div>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" style="margin-top:18px">
+    {% csrf_token %}
+    <div style="display:flex;gap:12px;margin-bottom:12px">
+      <div style="flex:1">
+        <label style="display:block;color:#cbd6ef;margin-bottom:6px">ชื่อทีม :</label>
+        <input type="text" name="team_name" required style="width:100%;padding:10px;border-radius:8px;border:none;background:#0f1230;color:#fff">
+      </div>
+      <div style="width:200px">
+        <label style="display:block;color:#cbd6ef;margin-bottom:6px">อัปโหลดโลโก้ทีม :</label>
+        <input type="file" name="team_logo" accept="image/*" style="width:100%">
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:18px">
+      <button class="btn btn-primary" type="submit" style="width:220px">ยืนยันการสมัคร</button>
+    </div>
+  </form>
+</div>
+
+{% endblock %}

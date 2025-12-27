@@ -1,0 +1,259 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}เลือกรายการแข่งขัน{% endblock %}
+
+{% block content %}
+<style>
+    .page-header {
+        text-align: center;
+        padding: 60px 0 40px;
+        position: relative;
+    }
+
+    .page-title {
+        font-size: 3rem;
+        font-weight: 800;
+        background: linear-gradient(to right, #fff, #ffd700);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
+        margin-bottom: 10px;
+    }
+
+    .tournament-card {
+        background: rgba(30, 30, 40, 0.6);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
+
+    .tournament-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(45deg, transparent, rgba(255, 215, 0, 0.03), transparent);
+        opacity: 0;
+        transition: opacity 0.4s;
+        pointer-events: none;
+    }
+
+    .tournament-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        border-color: rgba(255, 215, 0, 0.3);
+    }
+
+    .tournament-card:hover::before {
+        opacity: 1;
+    }
+
+    .card-img-top {
+        height: 140px;
+        background: linear-gradient(135deg, #2a2a3e 0%, #1a1a2e 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* ... */
+
+    .card-body {
+        padding: 25px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        z-index: 2;
+    }
+
+    .game-icon {
+        font-size: 4rem;
+        color: rgba(255, 255, 255, 0.1);
+    }
+
+    .status-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        backdrop-filter: blur(4px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .status-open {
+        background: rgba(46, 204, 113, 0.2);
+        color: #2ecc71;
+        border: 1px solid rgba(46, 204, 113, 0.4);
+    }
+
+    .status-ongoing {
+        background: rgba(241, 196, 15, 0.2);
+        color: #f1c40f;
+        border: 1px solid rgba(241, 196, 15, 0.4);
+    }
+
+    .status-closed {
+        background: rgba(149, 165, 166, 0.2);
+        color: #95a5a6;
+        border: 1px solid rgba(149, 165, 166, 0.4);
+    }
+
+    .status-finished {
+        background: rgba(231, 76, 60, 0.2);
+        color: #e74c3c;
+        border: 1px solid rgba(231, 76, 60, 0.4);
+    }
+
+    .card-body {
+        padding: 25px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        z-index: 2;
+    }
+
+    .card-title {
+        color: #fff;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 5px;
+        letter-spacing: 0.5px;
+    }
+
+    .game-title {
+        color: #8899a6;
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .meta-info {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 25px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .meta-item {
+        color: #b0b3b8;
+        font-size: 0.9rem;
+    }
+
+    .meta-label {
+        display: block;
+        color: #6c757d;
+        font-size: 0.75rem;
+        margin-bottom: 4px;
+    }
+
+    .btn-bracket {
+        background: linear-gradient(90deg, #ffc107 0%, #ff9800 100%);
+        color: #000;
+        border: none;
+        width: 100%;
+        padding: 12px;
+        border-radius: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-top: auto;
+    }
+
+    .btn-bracket:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(255, 152, 0, 0.3);
+        color: #000;
+        background: linear-gradient(90deg, #ffca28 0%, #ffa726 100%);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 20px;
+        border: 2px dashed rgba(255, 255, 255, 0.1);
+    }
+</style>
+
+<div class="container pb-5">
+    <div class="page-header">
+        <h1 class="page-title">รายการแข่งขันทั้งหมด</h1>
+        <p style="color: #9aa0a6;">เลือกรายการที่ต้องการเพื่อดูสายการแข่งขันและผลคะแนน</p>
+    </div>
+
+    <div class="row g-4">
+        {% for tournament in tournaments %}
+        <div class="col-md-6 col-lg-4">
+            <div class="tournament-card">
+                <div class="card-img-top"
+                    style="{% if tournament.featured_image %}background-image: url('{{ tournament.featured_image.url }}'); background-size: cover; background-position: center;{% elif tournament.game and tournament.game.image %}background-image: url('{{ tournament.game.image.url }}'); background-size: cover; background-position: center;{% endif %}">
+                    {% if not tournament.featured_image and not tournament.game.image %}
+                    <i class="fas fa-gamepad game-icon"></i>
+                    {% endif %}
+                    <span class="status-badge status-{{ tournament.status }}">
+                        {{ tournament.get_status_display }}
+                    </span>
+                    <!-- Overlay for better text readability if needed, though title is below -->
+                </div>
+
+                <div class="card-body">
+                    <h3 class="card-title">{{ tournament.name }}</h3>
+                    <div class="game-title">
+                        <i class="fas fa-ghost"></i> {{ tournament.game_title|default:"General Esports" }}
+                    </div>
+
+                    <div class="meta-info">
+                        <div class="meta-item">
+                            <span class="meta-label">วันที่เริ่มแข่ง</span>
+                            <i class="far fa-calendar-alt me-1"></i> {{ tournament.start_date|date:"d M Y" }}
+                        </div>
+                        <div class="meta-item text-end">
+                            <span class="meta-label">จำนวนทีม</span>
+                            <i class="fas fa-users me-1"></i> {{ tournament.registrations.count }} ทีม
+                        </div>
+                    </div>
+
+                    <a href="{% url 'tournament_bracket' tournament.pk %}" class="btn-bracket">
+                        <span>ตารางการแข่งขัน</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="empty-state">
+                <i class="fas fa-trophy mb-4" style="font-size: 4rem; color: #333;"></i>
+                <h3 class="text-white">ยังไม่มีรายการแข่งขัน</h3>
+                <p class="text-gray-500">โปรดรอติดตามอัปเดตการแข่งขันระลอกใหม่เร็วๆ นี้</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

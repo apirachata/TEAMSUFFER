@@ -1,0 +1,281 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}ออกจากระบบ - TEAMSUFFER{% endblock %}
+
+{% block content %}
+<style>
+    .logout-wrapper {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+        padding: 20px;
+    }
+
+    .logout-container {
+        background: rgba(15, 18, 35, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 60px 40px;
+        max-width: 450px;
+        width: 100%;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(10px);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .logout-container::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(255, 107, 53, 0.1) 0%, transparent 70%);
+        border-radius: 50%;
+    }
+
+    .logout-icon {
+        font-size: 4rem;
+        color: var(--primary-color);
+        margin-bottom: 20px;
+        animation: slideDown 0.6s ease-out;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .logout-title {
+        font-size: 2rem;
+        color: #fff;
+        margin-bottom: 16px;
+        font-weight: 700;
+        position: relative;
+        z-index: 1;
+    }
+
+    .logout-message {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 1rem;
+        margin-bottom: 30px;
+        line-height: 1.6;
+        position: relative;
+        z-index: 1;
+    }
+
+    .logout-content {
+        background: rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 30px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .messages {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .messages li {
+        color: #a8d261;
+        font-size: 0.95rem;
+        margin-bottom: 10px;
+        padding: 8px 12px;
+        background: rgba(168, 210, 97, 0.1);
+        border-left: 3px solid #a8d261;
+        border-radius: 4px;
+    }
+
+    .messages li:last-child {
+        margin-bottom: 0;
+    }
+
+    .logout-question {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 1.1rem;
+        margin-bottom: 28px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .logout-actions {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 24px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .logout-button {
+        padding: 14px 24px;
+        background: linear-gradient(135deg, var(--primary-color) 0%, #ff9f5a 100%);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+    }
+
+    .logout-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.2);
+        transition: left 0.4s ease;
+    }
+
+    .logout-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 28px rgba(255, 107, 53, 0.35);
+    }
+
+    .logout-button:hover::before {
+        left: 100%;
+    }
+
+    .logout-cancel {
+        padding: 14px 24px;
+        background: rgba(255, 255, 255, 0.06);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .logout-cancel:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .logout-menu {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .logout-menu li {
+        margin-bottom: 8px;
+    }
+
+    .logout-menu a {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+        display: inline-block;
+    }
+
+    .logout-menu a:hover {
+        color: #ff9f5a;
+    }
+
+    @media (max-width: 600px) {
+        .logout-container {
+            padding: 40px 24px;
+        }
+
+        .logout-title {
+            font-size: 1.5rem;
+        }
+
+        .logout-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<div class="logout-wrapper">
+    <div class="logout-container">
+        <div class="logout-icon">
+            <i class="fas fa-sign-out-alt"></i>
+        </div>
+
+        <h1 class="logout-title">{% trans 'ออกจากระบบ' %}</h1>
+        <p class="logout-message">{% trans 'คุณยืนยันว่าต้องการออกจากระบบหรือไม่?' %}</p>
+
+        {% if messages %}
+        <div class="logout-content">
+            <ul class="messages">
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <p class="logout-question">{% trans 'กำลังไปที่ไหนจากที่นี่?' %}</p>
+
+        <form method="post" action="{% url 'account_logout' %}" style="width: 100%;">
+            {% csrf_token %}
+            <button type="submit" class="logout-button" style="width: 100%; margin-bottom: 12px;">
+                <i class="fas fa-sign-out-alt" style="margin-right: 8px;"></i>
+                {% trans 'ยืนยันการออกจากระบบ' %}
+            </button>
+        </form>
+        <a href="{% url 'home' %}" class="logout-cancel" style="width: 100%; display: inline-block;">
+            <i class="fas fa-arrow-left" style="margin-right: 8px;"></i>
+            {% trans 'กลับหน้าหลัก' %}
+        </a>
+
+
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form[action*="account_logout"]');
+    if (form) {
+        const button = form.querySelector('button[type="submit"]');
+        
+        button.addEventListener('click', function(e) {
+            // Show loading state
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i>{% trans "กำลังออกจากระบบ..." %}';
+        });
+    }
+});
+
+// After form submission, django-allauth redirects to LOGOUT_REDIRECT_URL (which is '/')
+// If for some reason we're still here after 3 seconds, force redirect
+setTimeout(function() {
+    if (window.location.href.includes('logout')) {
+        window.location.href = "{% url 'home' %}";
+    }
+}, 3000);
+</script>
+
+{% endblock %}

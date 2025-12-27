@@ -1,0 +1,373 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load social_helpers %}
+{% load static %}
+
+{% block title %}สมัครสมาชิก - TEAMSUFFER{% endblock %}
+
+{% block content %}
+<style>
+    .signup-wrapper {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+    }
+
+    .signup-left {
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.3) 100%),
+                    url('{% static "images/login-hero.jpg" %}') center/cover;
+        background-blend-mode: darken;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+        position: relative;
+    }
+
+    .signup-left::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(255, 107, 53, 0.05) 0%, rgba(0, 78, 137, 0.05) 100%);
+    }
+
+    .signup-left-content {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        color: #fff;
+    }
+
+    .signup-logo {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 20px;
+        color: var(--primary-color);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .signup-logo i {
+        font-size: 4rem;
+    }
+
+    .signup-tagline {
+        font-size: 1.1rem;
+        color: rgba(255, 255, 255, 0.8);
+        margin-top: 20px;
+        line-height: 1.6;
+    }
+
+    .signup-right {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+        background: rgba(15, 18, 35, 0.9);
+        overflow-y: auto;
+        max-height: 100vh;
+    }
+
+    .signup-form-container {
+        width: 100%;
+        max-width: 380px;
+        padding: 10px 0;
+    }
+
+    .signup-form-title {
+        font-size: 2rem;
+        color: #fff;
+        margin-bottom: 30px;
+        font-weight: 700;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 18px;
+    }
+
+    .form-group label {
+        color: #cbd6ef;
+        font-size: 0.95rem;
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        padding: 12px 14px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 6px;
+        color: #fff;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        font-family: inherit;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+        outline: none;
+        background: rgba(255, 255, 255, 0.12);
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+    }
+
+    .help-text {
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 0.8rem;
+        margin-top: 4px;
+        line-height: 1.4;
+    }
+
+    .errorlist {
+        list-style: none;
+        padding: 0;
+        margin: 6px 0 0 0;
+        color: #ff6b35;
+        font-size: 0.85rem;
+    }
+
+    .errorlist li {
+        margin-bottom: 4px;
+    }
+
+    .signup-button {
+        width: 100%;
+        padding: 12px 16px;
+        background: linear-gradient(135deg, var(--primary-color) 0%, #ff9f5a 100%);
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 12px;
+        margin-bottom: 18px;
+    }
+
+    .signup-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(255, 107, 53, 0.4);
+    }
+
+    .divider {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 18px;
+        color: rgba(255, 255, 255, 0.4);
+    }
+
+    .divider::before,
+    .divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+    .social-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 18px;
+    }
+
+    .social-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 12px 16px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 6px;
+        color: #fff;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .social-btn:hover {
+        background: rgba(255, 255, 255, 0.12);
+        border-color: var(--primary-color);
+    }
+
+    .social-icon {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        font-weight: 700;
+    }
+
+    .social-btn.google .social-icon {
+        background: #fff;
+        color: #4285F4;
+    }
+
+    .login-link {
+        text-align: center;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.9rem;
+    }
+
+    .login-link a {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .login-link a:hover {
+        color: #ff9f5a;
+    }
+
+    .terms-text {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.6);
+        text-align: center;
+        line-height: 1.5;
+        margin-bottom: 18px;
+    }
+
+    .terms-text a {
+        color: var(--primary-color);
+        text-decoration: none;
+    }
+
+    .terms-text a:hover {
+        text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+        .signup-wrapper {
+            grid-template-columns: 1fr;
+        }
+
+        .signup-left {
+            display: none;
+        }
+
+        .signup-form-title {
+            font-size: 1.5rem;
+        }
+
+        .signup-form-container {
+            max-width: 100%;
+        }
+
+        .signup-right {
+            max-height: none;
+            padding: 20px;
+        }
+    }
+</style>
+
+<div class="signup-wrapper">
+    <div class="signup-left">
+        <div class="signup-left-content">
+            <div class="signup-logo">
+                <i class="fas fa-trophy"></i>
+                <span>TEAMSUFFER</span>
+            </div>
+            <p class="signup-tagline">
+                ระบบจัดการทัวร์นาเมนต์ esports<br>
+                สำหรับทีมกีฬาอิเล็กทรอนิกส์
+            </p>
+        </div>
+    </div>
+
+    <div class="signup-right">
+        <div class="signup-form-container">
+            <h1 class="signup-form-title">Sign Up</h1>
+
+            {% if redirect_field_value %}
+                <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+            {% endif %}
+
+            <form method="post" action="{% url 'account_signup' %}">
+                {% csrf_token %}
+
+                {% for field in form %}
+                    <div class="form-group">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.name == 'password1' %}
+                            <div class="help-text">
+                                <ul>
+                                    <li>รหัสผ่านของคุณไม่ควรมีความคล้ายคลึงกับข้อมูลส่วนตัวของคุณ</li>
+                                    <li>รหัสผ่านต้องมีความยาวอย่างน้อย 8 ตัวอักษร</li>
+                                    <li>รหัสผ่านต้องไม่ใช่รหัสที่ใช้กันอย่างแพร่หลาย</li>
+                                    <li>รหัสผ่านต้องไม่เป็นตัวเลขทั้งหมด</li>
+                                </ul>
+                            </div>
+                        {% elif field.help_text %}
+                            <p class="help-text">{{ field.help_text|safe }}</p>
+                        {% endif %}
+                        {% if field.errors %}
+                            {{ field.errors }}
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                {% if form.non_field_errors %}
+                    <div class="errorlist">
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <p class="terms-text">
+                    By signing up, you agree to our Terms of Service and Privacy Policy
+                </p>
+
+                <button type="submit" class="signup-button">Create Account</button>
+
+                {% social_apps as social_providers %}
+                {% if social_providers %}
+                    <div class="divider">or</div>
+                    <div class="social-buttons">
+                        {% for provider in social_providers %}
+                            <a href="{% provider_login_url provider.provider %}" class="social-btn {% if provider.provider == 'google' %}google{% endif %}">
+                                <span class="social-icon">
+                                    {% if provider.provider == 'google' %}
+                                        G
+                                    {% else %}
+                                        {{ provider.provider|slice:":1"|upper }}
+                                    {% endif %}
+                                </span>
+                                <span>Sign up with {{ provider.get_provider_display }}</span>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div class="login-link">
+                    Already have an account? <a href="{% url 'account_login' %}">Sign in here</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

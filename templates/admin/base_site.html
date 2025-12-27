@@ -1,0 +1,24 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}TEAMS UFFER Admin{% endblock %}
+
+{% block extrahead %}
+<link rel="stylesheet" href="{% static 'admin/custom.css' %}">
+<style>
+  /* small override to make admin header transparent */
+  .module .dashboard-module { box-shadow:none }
+</style>
+{{ block.super }}
+{% endblock %}
+
+{% block branding %}
+<div class="tu-branding">
+  <div class="tu-logo">TEAMS UFFER</div>
+  <div class="tu-sub">Admin Console</div>
+</div>
+{% endblock %}
+
+{% block nav-global %}
+{{ block.super }}
+{% endblock %}

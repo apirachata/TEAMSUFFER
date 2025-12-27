@@ -1,0 +1,40 @@
+/* Custom admin styles for TEAMS UFFER */
+html,body{
+  background: linear-gradient(180deg,#0f0924 0%, #2b0437 60%);
+  color: #e6eefc;
+}
+/* Header */
+#header, #header-inner{background: linear-gradient(90deg,#3c0a5a 0%, #24143f 100%);border-bottom:1px solid rgba(255,255,255,0.04)}
+#site-name a{color:#fff;font-weight:800;letter-spacing:1px}
+#user-tools a{color:#dfe9ff}
+
+/* Module boxes */
+.dashboard-module, .app-dashboard-module{
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+  border-radius:12px;padding:14px;margin-bottom:14px;border:1px solid rgba(255,255,255,0.03);
+}
+
+/* Change model list look */
+.app-list li a{display:block;padding:10px 12px;border-radius:8px;margin-bottom:8px;background:rgba(255,255,255,0.02);color:#e9f2ff}
+.app-list li a:hover{background:linear-gradient(90deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.5)}
+
+/* Buttons */
+.button, input[type=submit], .deletelink{
+  background:linear-gradient(90deg,#ff7bb5,#7b6bff);border:none;color:#fff;padding:8px 12px;border-radius:8px;box-shadow:0 6px 18px rgba(123,107,255,0.18);
+}
+
+/* Tables */
+table{background:transparent}
+table th{background:rgba(255,255,255,0.03);color:#bcd6ff}
+tr:nth-child(even) td{background:rgba(255,255,255,0.01)}
+
+/* Form fieldsets */
+fieldset.module{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:10px;border:1px solid rgba(255,255,255,0.03);padding:12px}
+
+/* Bracket JSON display area in admin */
+#id_bracket{max-height:260px;overflow:auto;background:rgba(0,0,0,0.25);padding:10px;border-radius:8px;color:#dfeaff}
+
+/* Responsive tweaks */
+@media (max-width:900px){
+  .app-list li a{padding:8px}
+}

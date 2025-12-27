@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ผลการแข่ง - {{ tournament.name }}{% endblock %}
+
+{% block content %}
+<div style="max-width:1000px;margin:40px auto;padding:24px;background:rgba(15,18,35,0.85);border-radius:12px;color:#fff">
+  <h2 style="margin-bottom:8px">ผลการแข่ง</h2>
+  <p style="color:#9fb6ff;margin-bottom:18px">{{ tournament.name }}</p>
+  {% comment %} If admin saved a bracket JSON, render it with winners highlighted using results data. Fallback to results list table. {% endcomment %}
+  {% if tournament.bracket %}
+    {{ tournament.bracket|json_script:"bracket-data" }}
+    {% if results %}
+      {{ results|json_script:"results-data" }}
+    {% else %}
+      <script>var results = [];</script>
+    {% endif %}
+    <div style="background:linear-gradient(135deg,#2b0647 0%,#3b0b5a 50%,#2c235a 100%);padding:18px;border-radius:14px;color:#fff">
+      <h3 style="margin:6px 0 12px 0">ผลการแข่งขัน (Preview)</h3>
+      <div id="results-root" style="padding:14px;background:rgba(0,0,0,0.12);border-radius:10px;overflow:auto">
+        <div id="results-canvas" style="position:relative;padding:18px 12px"></div>
+        <svg id="results-svg" style="position:absolute;left:0;top:0;pointer-events:none;" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+    </div>
+    <script>
+    (function(){
+      const rawB = document.getElementById('bracket-data').textContent;
+      const bracket = JSON.parse(rawB);
+      const tournamentName = "{{ tournament.name|escapejs }}";
+      let results = [];
+      try{ results = JSON.parse(document.getElementById('results-data').textContent); }catch(e){ results = []; }
+      const resultsMap = {};
+      results.forEach(r=>{ resultsMap[r.match_id] = r; });
+
+      const root = document.getElementById('results-canvas');
+      const svg = document.getElementById('results-svg');
+      root.innerHTML=''; svg.innerHTML='';
+
+      function setSvgSize(){ const rect = document.getElementById('results-root').getBoundingClientRect(); svg.setAttribute('width', rect.width); svg.setAttribute('height', rect.height); svg.style.width = rect.width+'px'; svg.style.height = rect.height+'px'; }
+      function drawLine(x1,y1,x2,y2,color='#ff7bcb'){ const p=document.createElementNS('http://www.w3.org/2000/svg','path'); const dx=Math.abs(x2-x1)/2; p.setAttribute('d',`M ${x1} ${y1} C ${x1+dx} ${y1} ${x2-dx} ${y2} ${x2} ${y2}`); p.setAttribute('stroke',color); p.setAttribute('fill','none'); p.setAttribute('stroke-width','3'); p.setAttribute('stroke-linecap','round'); svg.appendChild(p); }
+
+      // helper to mark winner styling
+      function applyWinnerStyle(box, isWinner){ if(isWinner){ box.style.background = 'linear-gradient(90deg,#9ff7c7,#60d394)'; box.style.color='#072'; box.style.boxShadow='0 8px 28px rgba(6,120,72,0.18)'; } }
+
+      // render single/double winners bracket
+      if(bracket.type === 'single' || bracket.type === 'double'){
+        const rounds = bracket.type === 'single' ? bracket.rounds : bracket.winners.rounds;
+        const cols = document.createElement('div'); cols.style.display='flex'; cols.style.alignItems='flex-start'; root.appendChild(cols);
+        rounds.forEach((rnd,ci)=>{
+          const col = document.createElement('div'); col.className='br-col'; col.style.minWidth='220px'; col.style.marginRight='28px';
+          const title = document.createElement('h4'); title.textContent = 'Round '+(ci+1); title.style.color='#cfe0ff'; title.style.margin='0 0 8px 0'; col.appendChild(title);
+          rnd.forEach((m,mi)=>{
+            const br = document.createElement('div'); br.className='br-box'; br.style.marginBottom='18px'; br.style.width='200px'; br.style.height='56px'; br.style.padding='8px 10px'; br.style.background='#fff'; br.style.color='#111'; br.style.fontWeight='700';
+            const t1 = document.createElement('div'); t1.style.fontSize='14px'; t1.textContent = m.team1 ? m.team1.name : 'TBD';
+            const t2 = document.createElement('div'); t2.style.fontSize='13px'; t2.style.opacity='0.7'; t2.textContent = m.team2 ? m.team2.name : '';
+            br.appendChild(t1); br.appendChild(t2);
+            // if this match has a result, highlight winner
+            // try to match by team ids: resultsMap may contain match IDs only if MatchResult exists; bracket generator didn't include match ids, so we also check team ids
+            let isWinnerA=false, isWinnerB=false;
+            // check by match id mapping
+            for(const mid in resultsMap){ const r = resultsMap[mid]; if(r.team1_id === (m.team1? m.team1.id : null) && r.team2_id === (m.team2? m.team2.id : null)){ if(r.winner_id === (m.team1? m.team1.id : null)) isWinnerA=true; if(r.winner_id === (m.team2? m.team2.id : null)) isWinnerB=true; }}
+            // also check bracket's own winner field if present
+            if(m.winner){ if(m.winner.id === (m.team1? m.team1.id : null)) isWinnerA=true; if(m.winner.id === (m.team2? m.team2.id : null)) isWinnerB=true; }
+            if(isWinnerA) applyWinnerStyle(br,true);
+            if(isWinnerB) applyWinnerStyle(br,true);
+            col.appendChild(br);
+          });
+          cols.appendChild(col);
+        });
+        // draw connectors after layout
+        setTimeout(()=>{ setSvgSize(); const rootRect = document.getElementById('results-root').getBoundingClientRect(); const allCols = Array.from(document.querySelectorAll('.br-col')); allCols.forEach((col,ci)=>{ const boxes = Array.from(col.querySelectorAll('.br-box')); boxes.forEach((b,mi)=>{ const rect = b.getBoundingClientRect(); const x1 = rect.right - rootRect.left; const y1 = rect.top + rect.height/2 - rootRect.top; const next = allCols[ci+1]; if(!next) return; const parentIndex = Math.floor(mi/2); const parentBoxes = Array.from(next.querySelectorAll('.br-box')); const parent = parentBoxes[parentIndex]; if(!parent) return; const prect = parent.getBoundingClientRect(); const x2 = prect.left - rootRect.left; const y2 = prect.top + prect.height/2 - rootRect.top; drawLine(x1,y1,x2,y2); }); }); },50);
+        window.addEventListener('resize', ()=>{ setSvgSize(); });
+      }
+
+      // round robin / mini: show small results table with winner highlights
+      if(bracket.type === 'round_robin' || bracket.type === 'mini'){
+        const wrap = document.createElement('div'); wrap.style.display='grid'; wrap.style.gridTemplateColumns='1fr 1fr'; wrap.style.gap='12px';
+        if(bracket.type === 'round_robin'){
+            // build teams list and index map
+            const teams = bracket.teams || [];
+            const teamIndex = {};
+            teams.forEach((t,i)=>{ teamIndex[t.id] = i; });
+
+            // initialize standings and matrix
+            const standings = teams.map(t=>({id:t.id,name:t.name,played:0,wins:0,losses:0,draws:0,points:0,scored:0,conceded:0}));
+            const n = teams.length;
+            const matrix = Array.from({length:n}, ()=>Array.from({length:n}, ()=>null));
+
+            // populate from bracket.matches and results
+            bracket.matches.forEach(m=>{
+              const aId = m.team1 ? m.team1.id : null;
+              const bId = m.team2 ? m.team2.id : null;
+              if(aId == null || bId == null) return;
+              // find result by team ids (resultsMap keyed by match id may not exist for generated bracket)
+              const found = Object.values(resultsMap).find(r=> (r.team1_id === aId && r.team2_id === bId) || (r.team1_id === bId && r.team2_id === aId) );
+              if(found){
+                // determine orientation: ensure row = aId, col = bId
+                const scoreA = (found.team1_id === aId) ? found.team1_score : found.team2_score;
+                const scoreB = (found.team1_id === aId) ? found.team2_score : found.team1_score;
+                const ai = teamIndex[aId]; const bi = teamIndex[bId];
+                matrix[ai][bi] = {a:scoreA,b:scoreB};
+                matrix[bi][ai] = {a:scoreB,b:scoreA};
+
+                // update stats
+                const sa = standings[ai]; const sb = standings[bi];
+                sa.played += 1; sb.played += 1;
+                sa.scored += scoreA; sa.conceded += scoreB;
+                sb.scored += scoreB; sb.conceded += scoreA;
+                if(scoreA > scoreB){ sa.wins += 1; sb.losses += 1; sa.points += 3; }
+                else if(scoreA < scoreB){ sb.wins += 1; sa.losses += 1; sb.points += 3; }
+                else { sa.draws += 1; sb.draws += 1; sa.points += 1; sb.points += 1; }
+              }
+            });
+
+            // sort standings
+            standings.sort((x,y)=>{ if(y.points!==x.points) return y.points-x.points; const gdY = y.scored - y.conceded; const gdX = x.scored - x.conceded; if(gdY!==gdX) return gdY-gdX; return y.wins - x.wins; });
+
+            // create standings card
+            const standingsCard = document.createElement('div'); standingsCard.style.background='linear-gradient(180deg, rgba(40,22,70,0.95), rgba(33,24,46,0.95))'; standingsCard.style.padding='18px'; standingsCard.style.borderRadius='12px'; standingsCard.style.marginBottom='20px'; standingsCard.style.color='#fff';
+            const h = document.createElement('h3'); h.textContent='ตารางสรุปคะแนน'; h.style.margin='0 0 10px 0'; h.style.color='#cfe0ff'; standingsCard.appendChild(h);
+            const sub = document.createElement('div'); sub.textContent = tournamentName; sub.style.opacity='0.8'; sub.style.marginBottom='12px'; standingsCard.appendChild(sub);
+            const tbl = document.createElement('table'); tbl.style.width='100%'; tbl.style.borderCollapse='collapse';
+            const thead = document.createElement('thead'); const trh = document.createElement('tr'); ['อันดับ','ชื่อทีม','แข่ง','ชนะ','แพ้','คะแนน'].forEach(ti=>{ const th=document.createElement('th'); th.textContent=ti; th.style.padding='10px'; th.style.textAlign='left'; th.style.color='#9fb6ff'; trh.appendChild(th); }); thead.appendChild(trh); tbl.appendChild(thead);
+            const tbody = document.createElement('tbody'); standings.forEach((s,idx)=>{ const tr = document.createElement('tr'); if(idx===0){ tr.style.background='rgba(255,215,110,0.12)'; tr.style.borderLeft='4px solid #e7b11a'; }
+              const tdRank = document.createElement('td'); tdRank.textContent = (idx+1); tdRank.style.padding='10px'; tr.appendChild(tdRank);
+              const tdName = document.createElement('td'); tdName.textContent = s.name; tdName.style.padding='10px'; tr.appendChild(tdName);
+              const tdP = document.createElement('td'); tdP.textContent = s.played; tdP.style.padding='10px'; tr.appendChild(tdP);
+              const tdW = document.createElement('td'); tdW.textContent = s.wins; tdW.style.padding='10px'; tdW.style.color='#57d37c'; tr.appendChild(tdW);
+              const tdL = document.createElement('td'); tdL.textContent = s.losses; tdL.style.padding='10px'; tdL.style.color='#ff8aa3'; tr.appendChild(tdL);
+              const tdPts = document.createElement('td'); tdPts.textContent = s.points; tdPts.style.padding='10px'; tdPts.style.fontWeight='700'; tdPts.style.color='#ffd55b'; tr.appendChild(tdPts);
+              tbody.appendChild(tr);
+            }); tbl.appendChild(tbody); standingsCard.appendChild(tbl);
+
+            // create match matrix card
+            const matrixCard = document.createElement('div'); matrixCard.style.background='linear-gradient(180deg, rgba(45,35,70,0.95), rgba(30,25,40,0.95))'; matrixCard.style.padding='18px'; matrixCard.style.borderRadius='12px'; matrixCard.style.color='#fff';
+            const mh = document.createElement('h4'); mh.textContent='ตารางการแข่งขัน'; mh.style.color='#cfe0ff'; mh.style.margin='0 0 12px 0'; matrixCard.appendChild(mh);
+            const mtable = document.createElement('table'); mtable.style.width='100%'; mtable.style.borderCollapse='collapse'; mtable.style.tableLayout='fixed';
+            // header row
+            const mthead = document.createElement('thead'); const thr = document.createElement('tr'); const blank = document.createElement('th'); blank.textContent=''; blank.style.padding='10px'; thr.appendChild(blank);
+            teams.forEach(t=>{ const th=document.createElement('th'); th.textContent = t.name; th.style.padding='8px'; th.style.color='#9fb6ff'; th.style.textAlign='center'; thr.appendChild(th); }); mthead.appendChild(thr); mtable.appendChild(mthead);
+            const mtbody = document.createElement('tbody'); teams.forEach((t,i)=>{ const tr = document.createElement('tr'); const nameTd = document.createElement('td'); nameTd.textContent = t.name; nameTd.style.padding='8px'; nameTd.style.whiteSpace='nowrap'; tr.appendChild(nameTd);
+              teams.forEach((o,j)=>{ const td = document.createElement('td'); td.style.padding='6px'; td.style.textAlign='center'; td.style.fontWeight='700'; td.style.borderRadius='6px'; td.style.minWidth='56px';
+                if(i===j){ td.textContent='-'; td.style.opacity='0.4'; td.style.background='rgba(0,0,0,0.12)'; }
+                else{
+                  const cell = matrix[i][j]; if(cell){ const a = cell.a; const b = cell.b; td.textContent = `${a}-${b}`;
+                    if(a>b){ td.style.background='#1f6f4a'; td.style.color='#cfffe8'; }
+                    else if(a<b){ td.style.background='#6f2430'; td.style.color='#ffdede'; }
+                    else { td.style.background='#444b55'; td.style.color='#fff'; }
+                  } else { td.textContent=''; td.style.background='rgba(255,255,255,0.02)'; }
+                }
+                tr.appendChild(td);
+              }); mtbody.appendChild(tr);
+            }); mtable.appendChild(mtbody); matrixCard.appendChild(mtable);
+
+            // action buttons
+            const actions = document.createElement('div'); actions.style.display='flex'; actions.style.gap='12px'; actions.style.marginTop='14px';
+            const btnPublish = document.createElement('button'); btnPublish.textContent='เผยแพร่ตาราง'; btnPublish.style.background='#19b56a'; btnPublish.style.color='#fff'; btnPublish.style.border='none'; btnPublish.style.padding='10px 18px'; btnPublish.style.borderRadius='6px'; actions.appendChild(btnPublish);
+            const btnNew = document.createElement('button'); btnNew.textContent='สร้างใหม่'; btnNew.style.background='#f4a318'; btnNew.style.color='#fff'; btnNew.style.border='none'; btnNew.style.padding='10px 18px'; btnNew.style.borderRadius='6px'; actions.appendChild(btnNew);
+            const btnCancel = document.createElement('button'); btnCancel.textContent='ยกเลิก'; btnCancel.style.background='transparent'; btnCancel.style.border='1px solid rgba(255,255,255,0.06)'; btnCancel.style.color='#fff'; btnCancel.style.padding='10px 18px'; btnCancel.style.borderRadius='6px'; actions.appendChild(btnCancel);
+
+            // append cards
+            wrap.appendChild(standingsCard);
+            wrap.appendChild(matrixCard);
+            wrap.appendChild(actions);
+          } else {
+          bracket.groups.forEach((g,gi)=>{
+            const title = document.createElement('h4'); title.textContent = 'Group '+(gi+1); title.style.color='#cfe0ff'; title.style.margin='0 0 8px 0'; wrap.appendChild(title);
+            g.matches.forEach((m)=>{
+              const br = document.createElement('div'); br.className='br-box'; br.style.marginBottom='8px'; br.style.display='flex'; br.style.justifyContent='space-between'; br.style.padding='10px';
+              const a = document.createElement('div'); a.textContent = m.team1 ? m.team1.name : 'TBD';
+              const b = document.createElement('div'); b.textContent = m.team2 ? m.team2.name : 'TBD';
+              const found = Object.values(resultsMap).find(r=> (r.team1_id === (m.team1? m.team1.id : null) && r.team2_id === (m.team2? m.team2.id : null)) );
+              if(found){ if(found.winner_id === found.team1_id) a.style.fontWeight='900'; else b.style.fontWeight='900'; }
+              br.appendChild(a); br.appendChild(b); wrap.appendChild(br);
+            });
+          });
+        }
+        root.appendChild(wrap);
+      }
+    })();
+    </script>
+  {% else %}
+    {% if results_qs and results_qs.count %}
+      <div style="background:rgba(0,0,0,0.15);padding:14px;border-radius:10px">
+        <table style="width:100%;border-collapse:collapse">
+          <thead>
+            <tr style="text-align:left;color:#9fb6ff">
+              <th style="padding:10px 12px">ทีม 1</th>
+              <th style="padding:10px 12px">คะแนน</th>
+              <th style="padding:10px 12px">ทีม 2</th>
+              <th style="padding:10px 12px">ผู้ชนะ</th>
+              <th style="padding:10px 12px">เวลารายงาน</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for result in results_qs %}
+            <tr style="border-top:1px solid rgba(255,255,255,0.03)">
+              <td style="padding:12px">{{ result.match.team1.name }}</td>
+              <td style="padding:12px">{{ result.team1_score }} - {{ result.team2_score }}</td>
+              <td style="padding:12px">{{ result.match.team2.name }}</td>
+              <td style="padding:12px"><strong>{{ result.winner_team.name }}</strong></td>
+              <td style="padding:12px">{{ result.reported_at|date:'j M Y H:i' }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p style="color:#bbb">ยังไม่มีผลการแข่ง</p>
+    {% endif %}
+  {% endif %}
+</div>
+{% endblock %}

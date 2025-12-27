@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}จัดการผลการแข่งขัน - {{ tournament.name }}{% endblock %}
+
+{% block content %}
+<style>
+    .admin-page-container {
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+
+    .admin-header h2 {
+        font-size: 2rem;
+        background: linear-gradient(to right, #fff, #ffd700);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 800;
+        margin: 0;
+    }
+
+    .match-admin-card {
+        background: rgba(30, 30, 40, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+
+    .table-custom {
+        width: 100%;
+        border-collapse: collapse;
+        color: #ddd;
+    }
+
+    .table-custom th {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 15px;
+        text-align: center;
+        font-weight: 600;
+        color: #aaa;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .table-custom td {
+        padding: 15px;
+        vertical-align: middle;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .table-custom tr:last-child td {
+        border-bottom: none;
+    }
+
+    .team-input-group {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .score-input {
+        width: 60px;
+        padding: 8px;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 6px;
+        color: #fff;
+        text-align: center;
+        font-size: 1.1rem;
+        font-weight: bold;
+    }
+
+    .score-input:focus {
+        border-color: #ffd700;
+        outline: none;
+        background: rgba(255, 215, 0, 0.1);
+    }
+
+    .team-name-col {
+        font-weight: 500;
+        width: 25%;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .status-finished {
+        background: rgba(46, 204, 113, 0.2);
+        color: #2ecc71;
+        border: 1px solid rgba(46, 204, 113, 0.3);
+    }
+
+    .status-scheduled {
+        background: rgba(241, 196, 15, 0.2);
+        color: #f1c40f;
+        border: 1px solid rgba(241, 196, 15, 0.3);
+    }
+
+    .btn-save-all {
+        background: linear-gradient(90deg, #2ecc71 0%, #27ae60 100%);
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: bold;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-save-all:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+    }
+</style>
+
+<div class="admin-page-container">
+    <div class="admin-header">
+        <h2><i class="fas fa-tasks"></i> บันทึกผลการแข่งขัน</h2>
+        <div style="display: flex; gap: 10px;">
+            <a href="{% url 'tournament_bracket' tournament.pk %}" class="btn btn-secondary">
+                <i class="fas fa-sitemap"></i> ดูตารางแข่ง
+            </a>
+            <a href="{% url 'tournament_detail_frontend' tournament.pk %}" class="btn btn-outline-light">
+                <i class="fas fa-arrow-left"></i> กลับ
+            </a>
+        </div>
+    </div>
+
+    <div class="match-admin-card">
+        {% if matches %}
+        <form method="post" action="">
+            {% csrf_token %}
+            <div class="table-responsive">
+                <table class="table-custom">
+                    <thead>
+                        <tr>
+                            <th width="10%">รอบที่</th>
+                            <th width="10%">Match No.</th>
+                            <th class="text-end">ทีม 1</th>
+                            <th width="20%">ผลการแข่งขัน</th>
+                            <th class="text-start">ทีม 2</th>
+                            <th width="15%">สถานะ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for match in matches %}
+                        <tr style="{% if match.status == 'finished' %}background: rgba(46, 204, 113, 0.05);{% endif %}">
+                            <td class="text-center">{{ match.round_no }}</td>
+                            <td class="text-center">{{ match.match_no }}</td>
+
+                            <!-- Team 1 -->
+                            <td class="text-end team-name-col">
+                                {% if match.team1 %}
+                                <span
+                                    style="{% if match.result.winner_team == match.team1 %}color: #2ecc71; text-shadow: 0 0 10px rgba(46, 204, 113, 0.3);{% endif %}">
+                                    {{ match.team1.name }}
+                                    {% if match.result.winner_team == match.team1 %}<i
+                                        class="fas fa-check-circle ms-1"></i>{% endif %}
+                                </span>
+                                {% else %}
+                                <span class="text-muted fst-italic">รอคู่แข่ง</span>
+                                {% endif %}
+                            </td>
+
+                            <!-- Score Input -->
+                            <td>
+                                <div class="team-input-group">
+                                    {% if match.team1 and match.team2 %}
+                                    <input type="number" name="score_{{ match.id }}_team1"
+                                        value="{{ match.result.team1_score|default:0 }}" class="score-input" min="0">
+                                    <span style="font-weight: bold; color: #666;">:</span>
+                                    <input type="number" name="score_{{ match.id }}_team2"
+                                        value="{{ match.result.team2_score|default:0 }}" class="score-input" min="0">
+                                    {% else %}
+                                    <span class="text-muted">-</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+
+                            <!-- Team 2 -->
+                            <td class="text-start team-name-col">
+                                {% if match.team2 %}
+                                <span
+                                    style="{% if match.result.winner_team == match.team2 %}color: #2ecc71; text-shadow: 0 0 10px rgba(46, 204, 113, 0.3);{% endif %}">
+                                    {% if match.result.winner_team == match.team2 %}<i
+                                        class="fas fa-check-circle me-1"></i>{% endif %}
+                                    {{ match.team2.name }}
+                                </span>
+                                {% else %}
+                                <span class="text-muted fst-italic">รอคู่แข่ง</span>
+                                {% endif %}
+                            </td>
+
+                            <td class="text-center">
+                                {% if match.result %}
+                                <span class="status-badge status-finished">จบแล้ว</span>
+                                {% else %}
+                                <span class="status-badge status-scheduled">รอผล</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="padding: 20px; text-align: center; border-top: 1px solid rgba(255,255,255,0.1);">
+                <button type="submit" class="btn-save-all">
+                    <i class="fas fa-save me-2"></i> บันทึกผลทั้งหมด
+                </button>
+            </div>
+        </form>
+        {% else %}
+        <div style="padding: 60px 20px; text-align: center;">
+            <i class="fas fa-calendar-times" style="font-size: 3rem; color: #555; margin-bottom: 20px;"></i>
+            <h3 style="color: #fff;">ยังไม่มีข้อมูลการจับคู่</h3>
+            <p style="color: #aaa;">โปรดสร้างตารางการแข่งขันก่อนบันทึกผล</p>
+            <a href="{% url 'tournament_start' tournament.pk %}" class="btn btn-warning mt-3">
+                <i class="fas fa-bolt"></i> เริ่มการแข่งขัน / จับคู่
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

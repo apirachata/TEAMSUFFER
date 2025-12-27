@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ทีม - TEAMSUFFER{% endblock %}
+
+{% block content %}
+<div
+  style="max-width:1000px;margin:40px auto;padding:24px;background:linear-gradient(135deg,#1f2340,#352147);border-radius:12px;color:#fff">
+  <h2 style="margin-bottom:12px">รายการทีม</h2>
+
+  <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px">
+    <input id="searchTeam" placeholder="ค้นหาชื่อทีม"
+      style="flex:1;padding:10px;border-radius:8px;border:none;background:rgba(255,255,255,0.03);color:#fff">
+    <input id="codeInput" placeholder="รหัสทีม (ถ้ามี)"
+      style="width:180px;padding:10px;border-radius:8px;border:none;background:rgba(255,255,255,0.03);color:#fff">
+  </div>
+
+  <div style="background:rgba(0,0,0,0.12);padding:14px;border-radius:10px;color:#ddd">
+    <table style="width:100%;border-collapse:collapse">
+      <thead>
+        <tr style="text-align:left;color:#9fb6ff">
+          <th style="padding:10px 12px">ชื่อทีม</th>
+          <th style="padding:10px 12px;width:160px">จำนวนสมาชิก</th>
+          <th style="padding:10px 12px;width:140px">สถานะ</th>
+          <th style="padding:10px 12px;width:220px"></th>
+        </tr>
+      </thead>
+      <tbody id="teamsTable">
+        {% for team in teams %}
+        <tr class="team-row" data-name="{{ team.name|lower }}" style="border-top:1px solid rgba(255,255,255,0.03)">
+          <td style="padding:12px">{{ team.name }}</td>
+          <td style="padding:12px">{{ team.member_count }} / 6</td>
+          <td style="padding:12px">{% if team.member_count|default:0 < 6 %}เปิดรับ{% else %}เต็ม{% endif %}</td>
+          <td style="padding:12px">
+            {% if team.member_count|default:0 < 6 %} <form method="post"
+              style="display:flex;gap:8px;align-items:center">
+              {% csrf_token %}
+              <input type="hidden" name="team_id" value="{{ team.id }}">
+              <input class="form-join-code" name="join_code" placeholder="รหัส (ถ้ามี)"
+                style="padding:8px;border-radius:6px;border:none;background:rgba(255,255,255,0.03);color:#fff">
+              <button class="btn btn-primary" type="submit">เข้าร่วม</button>
+              </form>
+              {% else %}
+              <span style="color:#999">ไม่สามารถเข้าร่วม</span>
+              {% endif %}
+              {% if request.user.is_superuser %}
+              <a href="{% url 'delete_team' team.id %}" class="btn btn-sm btn-danger ms-2"
+                onclick="return confirm('ADMIN: ยืนยันการลบทีม {{ team.name }}?');"
+                style="padding:6px 12px;background:#dc3545;color:white;text-decoration:none;border-radius:6px;font-size:0.8rem;margin-left:8px;">
+                Delete
+              </a>
+              {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4" style="padding:18px;color:#bbb">ยังไม่มีทีม</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  const search = document.getElementById('searchTeam');
+  search.addEventListener('input', function () {
+    const q = this.value.trim().toLowerCase();
+    document.querySelectorAll('.team-row').forEach(r => {
+      const name = r.dataset.name || '';
+      r.style.display = name.includes(q) ? '' : 'none';
+    });
+  });
+
+  const topCode = document.getElementById('codeInput');
+  topCode.addEventListener('input', function () {
+    document.querySelectorAll('.form-join-code').forEach(i => i.value = this.value);
+  });
+</script>
+
+{% endblock %}

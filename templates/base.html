@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}TEAMSUFFER{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-logo">
+                <i class="fas fa-trophy"></i> TEAMSUFFER
+            </div>
+            <ul class="navbar-menu">
+                <li><a href="{% url 'home' %}" class="nav-link">หน้าหลัก</a></li>
+                <li><a href="{% url 'teams_frontend' %}" class="nav-link">ทีม</a></li>
+                <li><a href="{% url 'tournament_list_bracket' %}" class="nav-link">สายการแข่งขัน</a></li>
+                {% if user.is_authenticated %}
+                <li><a href="{% url 'account_profile' %}" class="nav-link">โปรไฟล์</a></li>
+                <li><a href="{% url 'account_logout' %}" class="nav-link logout-btn">ออกจากระบบ</a></li>
+                {% else %}
+                <li><a href="{% url 'account_login' %}" class="nav-link login-btn">เข้าสู่ระบบ</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    {% block content %}{% endblock %}
+
+    <footer class="footer">
+        <p>&copy; 2025 TEAMSUFFER. All rights reserved.</p>
+    </footer>
+
+    <script src="{% static 'js/script.js' %}"></script>
+</body>
+
+</html>

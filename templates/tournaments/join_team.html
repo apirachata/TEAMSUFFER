@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}เข้าร่วมทีม - {{ tournament.name }}{% endblock %}
+
+{% block content %}
+<style>
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+  }
+
+  .modal-content {
+    background-color: #2b2b4a;
+    margin: 10% auto;
+    padding: 25px;
+    border: 1px solid #444;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 12px;
+    color: white;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  }
+
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .close:hover {
+    color: white;
+  }
+
+  .btn-icon {
+    background: none;
+    border: none;
+    color: #4CAF50;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: 0.3s;
+    padding: 5px;
+  }
+
+  .btn-icon:hover {
+    color: #81C784;
+    transform: scale(1.1);
+  }
+</style>
+
+<div
+  style="max-width:900px;margin:40px auto;padding:24px;background:linear-gradient(135deg,#2b2b4a,#51306a);border-radius:12px;color:#fff">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px">
+    <a href="{% url 'tournament_detail_frontend' tournament.id %}" style="color:#cfe1ff;text-decoration:none;"><i
+        class="fas fa-arrow-left"></i> ย้อนกลับ</a>
+  </div>
+
+  <h2 style="margin-bottom:20px">{{ tournament.name }} - เข้าร่วมทีม</h2>
+
+  <div style="display:flex;gap:12px;align-items:center;margin-bottom:20px;flex-wrap:wrap;">
+    <div
+      style="flex:1; display:flex; align-items:center; background:rgba(255,255,255,0.05); border-radius:8px; padding:0 10px;">
+      <i class="fas fa-search" style="color:#aaa;"></i>
+      <input id="searchTeam" placeholder="ค้นหาชื่อทีม..."
+        style="flex:1;padding:12px;border:none;background:none;color:#fff;outline:none;">
+    </div>
+    <input id="codeInput" placeholder="กรอกรหัสทีม (ถ้ามี)"
+      style="width:160px;padding:12px;border-radius:8px;border:none;background:rgba(255,255,255,0.05);color:#fff;outline:none;border:1px solid rgba(255,255,255,0.1);">
+  </div>
+
+  <div style="background:rgba(0,0,0,0.2);padding:1px;border-radius:10px;overflow:hidden;">
+    <table style="width:100%;border-collapse:collapse">
+      <thead>
+        <tr style="text-align:left;background:rgba(0,0,0,0.2);color:#9fb6ff">
+          <th style="padding:15px">ชื่อทีม</th>
+          <th style="padding:15px;text-align:center">สมาชิก</th>
+          <th style="padding:15px">สถานะ</th>
+          <th style="padding:15px">เข้าร่วม</th>
+        </tr>
+      </thead>
+      <tbody id="teamsTable">
+        {% for team in teams %}
+        <tr class="team-row" data-name="{{ team.name|lower }}"
+          style="border-top:1px solid rgba(255,255,255,0.05); transition:background 0.2s;">
+          <td style="padding:15px; font-weight:bold; font-size:1.1em; display:flex; align-items:center; gap:10px;">
+            {% if team.logo_url %}
+            <img src="{{ team.logo_url }}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;">
+            {% else %}
+            <div
+              style="width:30px;height:30px;border-radius:50%;background:#666;display:flex;align-items:center;justify-content:center;font-size:0.8em;">
+              <i class="fas fa-shield-alt"></i></div>
+            {% endif %}
+            {{ team.name }}
+
+            <!-- Eye Icon -->
+            <button type="button" class="btn-icon" onclick="showMembers('{{ team.id }}', '{{ team.name|escapejs }}')"
+              title="ดูสมาชิก">
+              <i class="fas fa-eye"></i>
+            </button>
+
+            <!-- Hidden Members Data -->
+            <div id="members-{{ team.id }}" style="display:none;">
+              <ul style="list-style: none; padding: 0;">
+                {% for m in team.members.all %}
+                {% if m.status == 'accepted' %}
+                <li style="padding: 10px; border-bottom: 1px solid #444; display:flex; align-items:center; gap:10px;">
+                  <i class="fas fa-user-circle"
+                    style="font-size:1.5em; color: {% if m.role_in_team == 'leader' %}#FFD700{% else %}#ccc{% endif %};"></i>
+                  <div>
+                    <div style="font-weight:bold;">{{ m.user.username }}</div>
+                    <div style="font-size:0.8em; color:#aaa;">{{ m.role_in_team|title }}</div>
+                  </div>
+                </li>
+                {% endif %}
+                {% endfor %}
+              </ul>
+            </div>
+          </td>
+          <td style="padding:15px; text-align:center;">
+            <span class="badge" style="background:#333;padding:4px 8px;border-radius:4px;">{{ team.member_count }} /
+              6</span>
+          </td>
+          <td style="padding:15px">
+            {% if team.member_count|default:0 < 6 %} <span style="color:#4CAF50"><i class="fas fa-check-circle"></i>
+              เปิดรับ</span>
+              {% else %}
+              <span style="color:#f44336"><i class="fas fa-times-circle"></i> เต็ม</span>
+              {% endif %}
+          </td>
+          <td style="padding:15px">
+            {% if team.member_count|default:0 < 6 %} <form method="post"
+              style="display:flex;gap:8px;align-items:center">
+              {% csrf_token %}
+              <input type="hidden" name="team_id" value="{{ team.id }}">
+              <input class="form-join-code" name="join_code" placeholder="รหัส ?"
+                style="width:80px;padding:8px;border-radius:6px;border:1px solid #555;background:rgba(0,0,0,0.3);color:#fff;text-align:center;">
+              <button class="btn btn-primary" style="padding:8px 15px; font-size:0.9em;" type="submit">เข้าร่วม</button>
+              </form>
+              {% else %}
+              <button disabled
+                style="background:#444;border:none;color:#888;padding:8px 15px;border-radius:6px;cursor:not-allowed;">เต็ม</button>
+              {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4" style="padding:30px;text-align:center;color:#bbb">ยังไม่มีทีมสมัครแข่งในรายการนี้</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="memberModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">&times;</span>
+    <h3 id="modalTeamName" style="border-bottom:1px solid #444; padding-bottom:10px; margin-bottom:15px;">Team Members
+    </h3>
+    <div id="modalBody" style="max-height:300px; overflow-y:auto;">
+      <!-- Content will be injected here -->
+    </div>
+  </div>
+</div>
+
+<script>
+  // Modal Logic
+  const modal = document.getElementById("memberModal");
+  const modalBody = document.getElementById("modalBody");
+  const modalTitle = document.getElementById("modalTeamName");
+
+  function showMembers(teamId, teamName) {
+    const content = document.getElementById('members-' + teamId).innerHTML;
+    modalBody.innerHTML = content;
+    modalTitle.innerText = "สมาชิกทีม: " + teamName;
+    modal.style.display = "block";
+  }
+
+  function closeModal() {
+    modal.style.display = "none";
+  }
+
+  window.onclick = function (event) {
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  }
+
+  // Filter Logic
+  const search = document.getElementById('searchTeam');
+  search.addEventListener('input', function () {
+    const q = this.value.trim().toLowerCase();
+    document.querySelectorAll('.team-row').forEach(r => {
+      const name = r.dataset.name || '';
+      r.style.display = name.includes(q) ? '' : 'none';
+    });
+  });
+
+  // Sync Code Input
+  const topCode = document.getElementById('codeInput');
+  topCode.addEventListener('input', function () {
+    document.querySelectorAll('.form-join-code').forEach(i => i.value = this.value);
+  });
+</script>
+
+{% endblock %}
