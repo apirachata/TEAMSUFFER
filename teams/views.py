@@ -1,5 +1,6 @@
 from rest_framework import generics, permissions
 from .models import Team, TeamMember
+from tournaments.models import Game
 from .serializers import TeamSerializer, TeamMemberSerializer
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
@@ -64,7 +65,10 @@ def teams_frontend_list(request):
         messages.success(request, f'คุณเข้าร่วมทีม {team.name} เรียบร้อยแล้ว')
         return redirect('teams_frontend')
 
-    return render(request, 'teams/list.html', {'teams': teams})
+    # distinct games for filter
+    games = Game.objects.filter(teams__in=teams).distinct()
+
+    return render(request, 'teams/list.html', {'teams': teams, 'games': games})
 
 
 @login_required

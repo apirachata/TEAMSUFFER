@@ -1,5 +1,7 @@
+import random
+import string
 from rest_framework import generics, permissions
-from .models import Tournament, TournamentRegistration, Match, MatchResult
+from .models import Tournament, TournamentRegistration, Match, MatchResult, Game
 from .serializers import (
     TournamentSerializer,
     TournamentRegistrationSerializer,
@@ -95,7 +97,7 @@ def tournament_register_view(request, pk):
         # create registration if not already registered
         existing = TournamentRegistration.objects.filter(tournament=tournament, team=team).first()
         if not existing:
-            TournamentRegistration.objects.create(tournament=tournament, team=team, status='pending')
+            TournamentRegistration.objects.create(tournament=tournament, team=team, status='approved')
 
         # redirect to home (or you can create a tournament detail page)
         return redirect('home')
@@ -121,13 +123,16 @@ def create_team_and_register(request, pk):
             return render(request, 'tournaments/create_team.html', {'tournament': tournament})
 
         # Create team and mark creator
-        team = Team.objects.create(name=team_name, created_by=request.user)
+        # Generate random 6-digit numeric code
+        join_code = ''.join(random.choices(string.digits, k=6))
+        
+        team = Team.objects.create(name=team_name, created_by=request.user, join_code=join_code)
 
         # create TeamMember record with leader role
         TeamMember.objects.create(team=team, user=request.user, role_in_team='leader', status='accepted')
 
         # create registration
-        TournamentRegistration.objects.create(tournament=tournament, team=team, status='pending')
+        TournamentRegistration.objects.create(tournament=tournament, team=team, status='approved')
 
         messages.success(request, 'สร้างทีมและสมัครเรียบร้อยแล้ว')
         return redirect('home')
@@ -179,11 +184,15 @@ def tournament_join_team_view(request, pk):
         messages.success(request, f'คุณเข้าร่วมทีม {team.name} เรียบร้อยแล้ว')
         return redirect('tournament_detail_frontend', pk=pk)
 
-    return render(request, 'tournaments/join_team.html', {'tournament': tournament, 'teams': teams})
+    # get unique games from these teams (to use in filter dropdown)
+    # A team might not have a game assigned, so filter none if needed or handle in template
+    games = Game.objects.filter(teams__in=teams).distinct()
+
+    return render(request, 'tournaments/join_team.html', {'tournament': tournament, 'teams': teams, 'games': games})
 
 
 
-from .services import generate_bracket, list_standings
+from .services import generate_bracket, list_standings, advance_winner
 
 @login_required
 def start_tournament_view(request, pk):
@@ -204,6 +213,7 @@ def start_tournament_view(request, pk):
     return redirect('tournament_bracket', pk=pk)
 
 
+@login_required
 def tournament_bracket_view(request, pk):
     """Show tournament bracket/matches."""
     tournament = get_object_or_404(Tournament, pk=pk)
@@ -232,10 +242,59 @@ def tournament_bracket_view(request, pk):
 
 
 def tournament_standings_view(request, pk):
-    """Show standings table for the tournament."""
+    """
+    Show standings table for the tournament.
+    Admins can see pending teams and update scores inline.
+    """
     tournament = get_object_or_404(Tournament, pk=pk)
-    standings = list_standings(tournament)
-    return render(request, 'tournaments/standings.html', {'tournament': tournament, 'standings': standings})
+    
+    is_admin = request.user.is_authenticated and (request.user == tournament.created_by or request.user.is_superuser)
+    
+    if request.method == 'POST' and is_admin:
+        # Inline save logic
+        registrations = TournamentRegistration.objects.filter(tournament=tournament).select_related('team')
+        
+        for reg in registrations:
+            p_val = request.POST.get(f'played_{reg.id}')
+            w_val = request.POST.get(f'won_{reg.id}')
+            l_val = request.POST.get(f'lost_{reg.id}')
+            pts_val = request.POST.get(f'points_{reg.id}')
+            score_val = request.POST.get(f'score_{reg.id}')
+            team_name_val = request.POST.get(f'team_name_{reg.id}')
+            
+            # Helper to convert empty string to None
+            def parse_int(val):
+                if val and val.strip():
+                    try:
+                        return int(val)
+                    except ValueError:
+                        return None
+                return None
+            
+            # Only update if at least one value is present in POST for this reg
+            # (Check if the field exists in request.POST to distinguish from just empty)
+            if f'played_{reg.id}' in request.POST:
+                reg.manual_played = parse_int(p_val)
+                reg.manual_won = parse_int(w_val)
+                reg.manual_lost = parse_int(l_val)
+                reg.manual_points = parse_int(pts_val)
+                reg.manual_score = parse_int(score_val)
+                reg.save()
+            
+            if team_name_val and team_name_val.strip() and team_name_val != reg.team.name:
+                reg.team.name = team_name_val.strip()
+                reg.team.save()
+        
+        messages.success(request, "บันทึกตารางคะแนนเรียบร้อยแล้ว")
+        return redirect('tournament_standings', pk=pk)
+
+    standings = list_standings(tournament, include_pending=True)
+    
+    return render(request, 'tournaments/standings.html', {
+        'tournament': tournament, 
+        'standings': standings,
+        'is_admin': is_admin
+    })
 
 
 @login_required
@@ -312,5 +371,47 @@ def tournament_list_bracket_view(request):
 def random_team_generator_view(request):
     """Standalone tool for randomizing teams."""
     return render(request, 'tournaments/random_team_generator.html')
+
+
+@login_required
+def manage_standings_view(request, pk):
+    """Admin view to manually override standings."""
+    tournament = get_object_or_404(Tournament, pk=pk)
+    
+    # Check permission
+    if request.user != tournament.created_by and not request.user.is_superuser:
+        messages.error(request, "คุณไม่มีสิทธิ์จัดการตารางคะแนนนี้")
+        return redirect('tournament_standings', pk=pk)
+
+    registrations = TournamentRegistration.objects.filter(tournament=tournament, status='approved').select_related('team').order_by('team__name')
+
+    if request.method == 'POST':
+        for reg in registrations:
+            p_val = request.POST.get(f'played_{reg.id}')
+            w_val = request.POST.get(f'won_{reg.id}')
+            l_val = request.POST.get(f'lost_{reg.id}')
+            pts_val = request.POST.get(f'points_{reg.id}')
+            score_val = request.POST.get(f'score_{reg.id}')
+            
+            # Helper to convert empty string to None
+            def parse_int(val):
+                if val and val.strip():
+                    try:
+                        return int(val)
+                    except ValueError:
+                        return None
+                return None
+            
+            reg.manual_played = parse_int(p_val)
+            reg.manual_won = parse_int(w_val)
+            reg.manual_lost = parse_int(l_val)
+            reg.manual_points = parse_int(pts_val)
+            reg.manual_score = parse_int(score_val)
+            reg.save()
+            
+        messages.success(request, "บันทึกตารางคะแนนเรียบร้อยแล้ว")
+        return redirect('tournament_standings', pk=pk)
+
+    return render(request, 'tournaments/manage_standings.html', {'tournament': tournament, 'registrations': registrations})
 
 

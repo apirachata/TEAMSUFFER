@@ -6,7 +6,7 @@ from .models import UserProfile
 class UserForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email', 'username']
+        fields = ['first_name', 'last_name', 'email']
         widgets = {
             'email': forms.EmailInput(attrs={'readonly': False}),
         }
@@ -15,7 +15,4 @@ class UserForm(forms.ModelForm):
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ['display_name', 'phone', 'avatar', 'role']
-        widgets = {
-            'role': forms.Select(attrs={'disabled': False}),
-        }
+        fields = ['display_name', 'phone', 'avatar']

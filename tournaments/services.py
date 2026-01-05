@@ -195,48 +195,99 @@ def _generate_single_elimination(tournament, teams):
                 next_round_participants.append(None) # TBD
                 
 
-def list_standings(tournament):
+def list_standings(tournament, include_pending=False):
     """
     Calculate standings (won/lost/points).
+    If manual override fields are set in TournamentRegistration, use them instead.
+    include_pending: If True, include teams with pending status (useful for admin inline editing).
     """
     from teams.models import Team
-    teams = Team.objects.filter(tournament_entries__tournament=tournament, tournament_entries__status='approved')
-    standings = {t.id: {'team': t, 'played': 0, 'won': 0, 'lost': 0, 'points': 0, 'gd': 0} for t in teams}
+    from django.db.models import Q
+    
+    # Get registrations
+    if include_pending:
+        registrations = TournamentRegistration.objects.filter(
+            tournament=tournament
+        ).filter(Q(status='approved') | Q(status='pending')).select_related('team')
+    else:
+        registrations = TournamentRegistration.objects.filter(
+            tournament=tournament, 
+            status='approved'
+        ).select_related('team')
+    
+    standings = {}
+    for reg in registrations:
+        t = reg.team
+        # Check if manual points are set (assuming if points are set, others are too or 0)
+        if reg.manual_points is not None:
+             standings[t.id] = {
+                 'team': t,
+                 'reg_id': reg.id,
+                 'status': reg.status,
+                 'played': reg.manual_played or 0,
+                 'won': reg.manual_won or 0,
+                 'lost': reg.manual_lost or 0,
+                 'points': reg.manual_points or 0,
+                 'score': reg.manual_score or 0,
+                 'gd': 0, 
+                 'is_manual': True
+             }
+        else:
+             standings[t.id] = {
+                 'team': t, 
+                 'reg_id': reg.id,
+                 'status': reg.status,
+                 'played': 0, 
+                 'won': 0, 
+                 'lost': 0, 
+                 'points': 0, 
+                 'score': 0,
+                 'gd': 0,
+                 'is_manual': False
+             }
     
     results = MatchResult.objects.filter(match__tournament=tournament)
     
     for r in results:
         m = r.match
         
-        # Determine loser
         if r.winner_team == m.team1:
-            winner, loser = m.team1, m.team2
-            w_score, l_score = r.team1_score, r.team2_score
-        else:
-            winner, loser = m.team2, m.team1
-            w_score, l_score = r.team2_score, r.team1_score # Note: columns in MatchResult are fixed team1_score/team2_score
-            
-            # Wait, fields are team1_score and team2_score.
-            # If Winner is Team 2, then Team 2 score is r.team2_score.
+            winner = m.team1
+            loser = m.team2
+            w_score = r.team1_score
+            l_score = r.team2_score
+        elif r.winner_team == m.team2:
+            winner = m.team2
+            loser = m.team1
             w_score = r.team2_score
             l_score = r.team1_score
+        else:
+             winner = None
+             loser = None
+             w_score = 0
+             l_score = 0
 
         if winner and winner.id in standings:
             s = standings[winner.id]
-            s['played'] += 1
-            s['won'] += 1
-            s['points'] += 3
-            s['gd'] += (w_score - l_score)
+            if not s['is_manual']:
+                s['played'] += 1
+                s['won'] += 1
+                s['points'] += tournament.point_win
+                s['score'] += w_score
+                s['gd'] += (w_score - l_score)
             
         if loser and loser.id in standings:
             s = standings[loser.id]
-            s['played'] += 1
-            s['lost'] += 1
-            s['gd'] += (l_score - w_score)
+            if not s['is_manual']:
+                s['played'] += 1
+                s['lost'] += 1
+                s['points'] += tournament.point_loss
+                s['score'] += l_score
+                s['gd'] += (l_score - w_score)
             
     # Sort
     res = list(standings.values())
-    res.sort(key=lambda x: (-x['points'], -x['gd'], -x['won']))
+    res.sort(key=lambda x: (-x['points'], -x['score'], -x['won']))
     
     for i, item in enumerate(res):
         item['rank'] = i + 1

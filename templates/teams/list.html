@@ -11,8 +11,13 @@
   <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px">
     <input id="searchTeam" placeholder="ค้นหาชื่อทีม"
       style="flex:1;padding:10px;border-radius:8px;border:none;background:rgba(255,255,255,0.03);color:#fff">
-    <input id="codeInput" placeholder="รหัสทีม (ถ้ามี)"
-      style="width:180px;padding:10px;border-radius:8px;border:none;background:rgba(255,255,255,0.03);color:#fff">
+    <select id="gameFilter"
+      style="width:200px;padding:10px;border-radius:8px;border:none;background:rgba(255,255,255,0.03);color:#fff;outline:none;border:1px solid rgba(255,255,255,0.1);">
+      <option value="">ทั้งหมด (เลือกเกม)</option>
+      {% for game in games %}
+      <option value="{{ game.id }}">{{ game.name }}</option>
+      {% endfor %}
+    </select>
   </div>
 
   <div style="background:rgba(0,0,0,0.12);padding:14px;border-radius:10px;color:#ddd">
@@ -27,8 +32,14 @@
       </thead>
       <tbody id="teamsTable">
         {% for team in teams %}
-        <tr class="team-row" data-name="{{ team.name|lower }}" style="border-top:1px solid rgba(255,255,255,0.03)">
-          <td style="padding:12px">{{ team.name }}</td>
+        <tr class="team-row" data-name="{{ team.name|lower }}" data-game-id="{{ team.game.id|default:'' }}"
+          style="border-top:1px solid rgba(255,255,255,0.03)">
+          <td style="padding:12px">
+            {{ team.name }}
+            {% if team.game %}
+            <div style="font-size:0.85rem;color:#bbb;margin-top:4px;">{{ team.game.name }}</div>
+            {% endif %}
+          </td>
           <td style="padding:12px">{{ team.member_count }} / 6</td>
           <td style="padding:12px">{% if team.member_count|default:0 < 6 %}เปิดรับ{% else %}เต็ม{% endif %}</td>
           <td style="padding:12px">
@@ -64,18 +75,27 @@
 
 <script>
   const search = document.getElementById('searchTeam');
-  search.addEventListener('input', function () {
-    const q = this.value.trim().toLowerCase();
+  const gameFilter = document.getElementById('gameFilter');
+
+  function filterTeams() {
+    const q = search.value.trim().toLowerCase();
+    const g = gameFilter.value;
+
     document.querySelectorAll('.team-row').forEach(r => {
       const name = r.dataset.name || '';
-      r.style.display = name.includes(q) ? '' : 'none';
-    });
-  });
+      // data-game-id might be empty string if None
+      const gameId = r.dataset.gameId || '';
 
-  const topCode = document.getElementById('codeInput');
-  topCode.addEventListener('input', function () {
-    document.querySelectorAll('.form-join-code').forEach(i => i.value = this.value);
-  });
+      const matchName = name.includes(q);
+      const matchGame = (g === "" || gameId === g);
+
+      r.style.display = (matchName && matchGame) ? '' : 'none';
+    });
+  }
+
+  // Update rows on input
+  search.addEventListener('input', filterTeams);
+  gameFilter.addEventListener('change', filterTeams);
 </script>
 
 {% endblock %}

@@ -5,87 +5,198 @@
 
 {% block content %}
 <div class="container py-5">
-    <!-- Header Section -->
-    <div class="standings-card" style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
-        <div class="card-header p-4"
-            style="background: linear-gradient(90deg, #3b3b6d 0%, #2d2d44 100%); border-bottom: none;">
-            <h3 class="m-0 text-white d-flex align-items-center gap-2">
-                <i class="fas fa-trophy text-warning"></i> ตารางสรุปคะแนน
-            </h3>
-        </div>
+    <div class="row justify-content-center">
+        <div class="col-10 col-md-10 col-lg-8 col-xl-7">
+            <!-- Header Section -->
+            <div class="standings-card mb-4"
+                style="border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                <div class="card-header p-4 p-md-5 d-flex justify-content-between align-items-center flex-wrap gap-3"
+                    style="background: linear-gradient(135deg, #3b3b6d 0%, #1a1a2e 100%); border-bottom: none;">
+                    <h2 class="m-0 text-white fw-bold d-inline-flex align-items-center gap-3"
+                        style="font-size: 2rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+                        <i class="fas fa-trophy" style="color: #ffd700;"></i> ตารางสรุปคะแนน
+                    </h2>
 
-        <div class="card-body p-0" style="background-color: #2b2b3b;">
-            <div class="table-responsive">
-                <table class="table mb-0 text-white" style="border-collapse: collapse;">
-                    <thead style="background-color: #232332; font-size: 0.9rem; color: #aaa;">
-                        <tr>
-                            <th class="py-3 ps-4" style="width: 80px;">อันดับ</th>
-                            <th class="py-3">ชื่อทีม</th>
-                            <th class="py-3 text-center" style="width: 80px;">แข่ง</th>
-                            <th class="py-3 text-center" style="width: 80px;">ชนะ</th>
-                            <th class="py-3 text-center" style="width: 80px;">แพ้</th>
-                            <th class="py-3 text-center" style="width: 100px;">คะแนน</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for row in standings %}
-                        <tr
-                            style="border-bottom: 1px solid #38384a; {% if forloop.first %}background: linear-gradient(90deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 215, 0, 0.05) 100%); border-left: 4px solid #ffd700;{% else %}border-left: 4px solid transparent;{% endif %}">
-                            <td class="py-3 ps-4 fw-bold"
-                                style="{% if forloop.first %}color: #ffd700;{% else %}color: #888;{% endif %}">
-                                {{ row.rank }}
-                            </td>
-                            <td class="py-3">
-                                <div class="d-flex align-items-center gap-3">
-                                    {% if row.team.logo_url %}
-                                    <img src="{{ row.team.logo_url }}" alt="" class="rounded-circle"
-                                        style="width: 32px; height: 32px; object-fit: cover;">
-                                    {% else %}
-                                    <div class="rounded-circle d-flex align-items-center justify-content-center"
-                                        style="width: 32px; height: 32px; background: #444; color: #888; font-size: 12px;">
-                                        {{ row.team.name|slice:":2"|upper }}
-                                    </div>
-                                    {% endif %}
-                                    <span class="fw-medium text-white">{{ row.team.name }}</span>
-                                </div>
-                            </td>
-                            <td class="py-3 text-center text-white-50">{{ row.played }}</td>
-                            <td class="py-3 text-center text-success fw-bold">{{ row.won }}</td>
-                            <td class="py-3 text-center text-danger fw-bold">{{ row.lost }}</td>
-                            <td class="py-3 text-center fw-bold" style="color: #ffd700; font-size: 1.1rem;">{{
-                                row.points }}</td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="6" class="text-center py-5 text-muted">
-                                ยังไม่มีข้อมูลการแข่งขัน
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                    {% if user == tournament.created_by or user.is_superuser %}
+                    <a href="{% url 'manage_matches' tournament.pk %}" class="btn btn-warning px-4 py-2 fw-bold me-2"
+                        style="border-radius: 30px; box-shadow: 0 4px 15px rgba(255, 193, 7, 0.4);">
+                        <i class="fas fa-edit me-2"></i> จัดการผลแข่ง
+                    </a>
+                    <a href="{% url 'manage_standings' tournament.pk %}" class="btn btn-primary px-4 py-2 fw-bold"
+                        style="border-radius: 30px; box-shadow: 0 4px 15px rgba(13, 110, 253, 0.4);">
+                        <i class="fas fa-table me-2"></i> จัดการตาราง
+                    </a>
+                    {% endif %}
+                </div>
+
+                <div class="card-body p-0" style="background-color: #232332;">
+                    {% if is_admin %}
+                    <form method="post">
+                        {% csrf_token %}
+                        {% endif %}
+
+                        <div class="table-responsive">
+                            <table class="table mb-0 text-white" style="border-collapse: separate; border-spacing: 0;">
+                                <thead>
+                                    <tr style="background-color: #1e1e2d;">
+                                        <th class="py-4 ps-5 text-center fw-bold"
+                                            style="width: 80px; font-size: 1rem; color: #8f90a6; border-bottom: 2px solid #38384a;">
+                                            อันดับ</th>
+                                        <th class="py-4 fw-bold"
+                                            style="font-size: 1rem; color: #8f90a6; border-bottom: 2px solid #38384a;">
+                                            ชื่อทีม</th>
+                                        <th class="py-4 text-center fw-bold"
+                                            style="width: 80px; font-size: 1rem; color: #8f90a6; border-bottom: 2px solid #38384a;">
+                                            แข่ง</th>
+                                        <th class="py-4 text-center fw-bold text-success"
+                                            style="width: 80px; font-size: 1rem; border-bottom: 2px solid #38384a;">
+                                            ชนะ
+                                        </th>
+                                        <th class="py-4 text-center fw-bold text-danger"
+                                            style="width: 80px; font-size: 1rem; border-bottom: 2px solid #38384a;">
+                                            แพ้
+                                        </th>
+                                        <th class="py-4 text-center fw-bold text-info"
+                                            style="width: 80px; font-size: 1rem; border-bottom: 2px solid #38384a;">
+                                            Score
+                                        </th>
+                                        <th class="py-4 text-center fw-bold"
+                                            style="width: 100px; font-size: 1rem; color: #ffd700; border-bottom: 2px solid #38384a;">
+                                            Points</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for row in standings %}
+                                    <tr style="transition: all 0.3s ease;">
+                                        <td class="py-3 ps-5 text-center fw-bold position-relative"
+                                            style="font-size: 1.2rem; border-bottom: 1px solid #2d2d3d; {% if forloop.first %}color: #ffd700; font-size: 1.4rem;{% else %}color: #fff;{% endif %}">
+                                            {% if forloop.first %}
+                                            <div
+                                                style="position: absolute; left: 0; top: 0; bottom: 0; width: 6px; background-color: #ffd700;">
+                                            </div>
+                                            {% endif %}
+                                            {{ row.rank }}
+                                        </td>
+                                        <td class="py-3" style="border-bottom: 1px solid #2d2d3d;">
+                                            <div class="d-flex align-items-center gap-3">
+                                                {% if row.team.logo_url %}
+                                                <img src="{{ row.team.logo_url }}" alt=""
+                                                    class="rounded-circle shadow-sm"
+                                                    style="width: 48px; height: 48px; object-fit: cover; border: 2px solid {% if forloop.first %}#ffd700{% else %}#444{% endif %};">
+                                                {% else %}
+                                                <div class="rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                                                    style="width: 48px; height: 48px; background: #333; color: #aaa; font-weight: bold; font-size: 1rem; border: 2px solid {% if forloop.first %}#ffd700{% else %}#444{% endif %};">
+                                                    {{ row.team.name|slice:":2"|upper }}
+                                                </div>
+                                                {% endif %}
+
+                                                {% if is_admin %}
+                                                <div class="d-flex align-items-center">
+                                                    <input type="text" name="team_name_{{ row.reg_id }}"
+                                                        value="{{ row.team.name }}"
+                                                        class="form-control form-control-sm bg-dark text-white border-secondary fw-bold"
+                                                        style="min-width: 150px;">
+                                                    {% if row.status != 'approved' %}
+                                                    <span class="badge bg-warning text-dark ms-2"
+                                                        style="font-size:0.6rem;">Pending</span>
+                                                    {% endif %}
+                                                </div>
+                                                {% else %}
+                                                <span class="fw-bold" style="font-size: 1.1rem;">
+                                                    {{ row.team.name }}
+                                                    {% if row.status != 'approved' %}
+                                                    <span class="badge bg-warning text-dark ms-2"
+                                                        style="font-size:0.6rem;">Pending</span>
+                                                    {% endif %}
+                                                </span>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                        {% if is_admin %}
+                                        <td class="py-3 text-center" style="border-bottom: 1px solid #2d2d3d;">
+                                            <input type="number" name="played_{{ row.reg_id }}" value="{{ row.played }}"
+                                                class="form-control form-control-sm text-center bg-dark text-white border-secondary"
+                                                style="width: 70px; margin: 0 auto;">
+                                        </td>
+                                        <td class="py-3 text-center" style="border-bottom: 1px solid #2d2d3d;">
+                                            <input type="number" name="won_{{ row.reg_id }}" value="{{ row.won }}"
+                                                class="form-control form-control-sm text-center bg-dark text-white border-secondary"
+                                                style="width: 70px; margin: 0 auto;">
+                                        </td>
+                                        <td class="py-3 text-center" style="border-bottom: 1px solid #2d2d3d;">
+                                            <input type="number" name="lost_{{ row.reg_id }}" value="{{ row.lost }}"
+                                                class="form-control form-control-sm text-center bg-dark text-white border-secondary"
+                                                style="width: 70px; margin: 0 auto;">
+                                        </td>
+                                        <td class="py-3 text-center" style="border-bottom: 1px solid #2d2d3d;">
+                                            <input type="number" name="score_{{ row.reg_id }}" value="{{ row.score }}"
+                                                class="form-control form-control-sm text-center bg-dark text-white border-secondary"
+                                                style="width: 70px; margin: 0 auto;">
+                                        </td>
+                                        <td class="py-3 text-center" style="border-bottom: 1px solid #2d2d3d;">
+                                            <input type="number" name="points_{{ row.reg_id }}" value="{{ row.points }}"
+                                                class="form-control form-control-sm text-center bg-dark text-warning border-warning"
+                                                style="width: 70px; margin: 0 auto;">
+                                        </td>
+                                        {% else %}
+                                        <td class="py-3 text-center"
+                                            style="font-size: 1.2rem; color: #ccc; border-bottom: 1px solid #2d2d3d;">
+                                            {{ row.played }}
+                                        </td>
+                                        <td class="py-3 text-center fw-bold text-success"
+                                            style="font-size: 1.2rem; border-bottom: 1px solid #2d2d3d;">
+                                            {{ row.won }}
+                                        </td>
+                                        <td class="py-3 text-center fw-bold text-danger"
+                                            style="font-size: 1.2rem; border-bottom: 1px solid #2d2d3d;">
+                                            {{ row.lost }}
+                                        </td>
+                                        <td class="py-3 text-center fw-bold text-info"
+                                            style="font-size: 1.2rem; border-bottom: 1px solid #2d2d3d;">
+                                            {{ row.score }}
+                                        </td>
+                                        <td class="py-3 text-center fw-bold"
+                                            style="font-size: 1.4rem; color: #ffd700; border-bottom: 1px solid #2d2d3d; text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);">
+                                            {{ row.points }}
+                                        </td>
+                                        {% endif %}
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="7" class="text-center py-5 text-muted" style="font-size: 1.2rem;">
+                                            <i class="fas fa-info-circle mb-3 d-block" style="font-size: 2rem;"></i>
+                                            ยังไม่มีข้อมูลการแข่งขัน
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% if is_admin %}
+                        <div class="p-3 text-end bg-dark border-top border-secondary">
+                            <button type="submit" class="btn btn-primary fw-bold px-4">
+                                <i class="fas fa-save me-2"></i> บันทึกตารางคะแนน
+                            </button>
+                        </div>
+                    </form>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <style>
-    /* Custom Scrollbar for table if needed */
-    .table-responsive::-webkit-scrollbar {
-        height: 8px;
-    }
-
-    .table-responsive::-webkit-scrollbar-track {
-        background: #2b2b3b;
-    }
-
-    .table-responsive::-webkit-scrollbar-thumb {
-        background: #444;
-        border-radius: 4px;
-    }
-
     .table-hover tbody tr:hover {
-        background-color: rgba(255, 255, 255, 0.02);
+        background-color: rgba(255, 255, 255, 0.05);
+        transform: scale(1.005);
+        z-index: 10;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Better styling for the first row */
+    tbody tr:first-child {
+        background: linear-gradient(90deg, rgba(255, 215, 0, 0.05) 0%, rgba(35, 35, 50, 0) 100%);
     }
 </style>
 {% endblock %}

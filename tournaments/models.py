@@ -61,6 +61,11 @@ class Tournament(models.Model):
     ]
     bracket_type = models.CharField(max_length=30, choices=BRACKET_TYPE_CHOICES, blank=True, null=True)
 
+    # Point System Configuration
+    point_win = models.IntegerField(default=3, help_text="Points awarded for a win")
+    point_draw = models.IntegerField(default=1, help_text="Points awarded for a draw")
+    point_loss = models.IntegerField(default=0, help_text="Points awarded for a loss")
+
     def __str__(self):
         return self.name
 
@@ -99,6 +104,13 @@ class TournamentRegistration(models.Model):
         related_name='approvals'
     )
     approved_at = models.DateTimeField(null=True, blank=True)
+
+    # Manual Override for Standings (Optional)
+    manual_played = models.IntegerField(null=True, blank=True)
+    manual_won = models.IntegerField(null=True, blank=True)
+    manual_lost = models.IntegerField(null=True, blank=True)
+    manual_points = models.IntegerField(null=True, blank=True)
+    manual_score = models.IntegerField(null=True, blank=True, help_text="Manual total Game Score/Kill Points")
 
     class Meta:
         unique_together = ('tournament', 'team')  # ป้องกันไม่ให้สมัครซ้ำ

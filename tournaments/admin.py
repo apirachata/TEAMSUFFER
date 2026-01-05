@@ -144,8 +144,16 @@ class TournamentAdmin(admin.ModelAdmin):
 
 @admin.register(TournamentRegistration)
 class TournamentRegistrationAdmin(admin.ModelAdmin):
-	list_display = ('tournament', 'team', 'status', 'registered_at')
-	list_filter = ('status',)
+	list_display = ('tournament', 'team', 'status', 'manual_played', 'manual_won', 'manual_lost', 'manual_points', 'registered_at')
+	list_filter = ('status', 'tournament')
+	search_fields = ('team__name', 'tournament__name')
+	list_editable = ('manual_played', 'manual_won', 'manual_lost', 'manual_points', 'status')
+	fieldsets = (
+		(None, {'fields': ('tournament', 'team', 'status')}),
+		('Manual Overrides (Optional)', {'fields': ('manual_played', 'manual_won', 'manual_lost', 'manual_points')}),
+		('Meta', {'fields': ('registered_at', 'approved_by', 'approved_at')}),
+	)
+	readonly_fields = ('registered_at',)
 
 
 @admin.register(Match)

@@ -185,6 +185,10 @@
           {% endif %}
           <div>
             <h3 style="margin: 0; color: #ffd700;">{{ team.name }}</h3>
+            {% if team.game %}
+            <p style="margin: 3px 0 0; color: #bbb; font-size: 0.9em;">Game: <span style="color: #fff;">{{
+                team.game.name }}</span></p>
+            {% endif %}
             <p style="margin: 5px 0 0; color: #aaa;">Team Code: <span style="color: #fff; font-family: monospace;">{{
                 team.join_code|default:"-" }}</span></p>
           </div>
