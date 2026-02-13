@@ -30,6 +30,7 @@ urlpatterns = [
      path('tournaments/<int:pk>/join-team/', views.tournament_join_team_view, name='tournament_join_team'),
      path('tournaments/<int:pk>/manage/', views.manage_matches_view, name='manage_matches'),
      path('tournaments/<int:pk>/standings/manage/', views.manage_standings_view, name='manage_standings'),
+     path('tournaments/<int:pk>/swap-teams/', views.swap_teams_view, name='swap_teams'),
      path('tournaments/brackets/', views.tournament_list_bracket_view, name='tournament_list_bracket'),
      path('tournaments/random-teams/', views.random_team_generator_view, name='random_team_generator'),
 ]

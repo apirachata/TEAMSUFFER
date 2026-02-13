@@ -1,0 +1,52 @@
+@startuml
+autonumber
+actor "Admin/Owner" as Admin
+boundary "Manage Matches View" as View
+control "Match Controller" as Controller
+entity "Match" as MatchModel
+entity "MatchResult" as ResultModel
+entity "TournamentService" as Service
+database "Database" as DB
+
+Admin -> View: Request Manage Matches Page (GET)
+activate View
+View -> DB: Fetch Matches
+DB --> View: List of Matches
+View --> Admin: Display Match List
+deactivate View
+
+Admin -> View: Input Scores & Submit (POST)
+activate View
+View -> Controller: Process Score Update
+activate Controller
+
+loop For each match in form
+    Controller -> MatchModel: Validate Teams exist
+    
+    alt Valid Score Input
+        Controller -> MatchModel: Determine Winner
+        
+        Controller -> ResultModel: Create/Update MatchResult
+        activate ResultModel
+        ResultModel -> DB: Save (winner, scores, reported_by)
+        deactivate ResultModel
+        
+        Controller -> MatchModel: Update Status to 'finished'
+        activate MatchModel
+        MatchModel -> DB: Save
+        deactivate MatchModel
+        
+        Controller -> Service: advance_winner(match)
+        activate Service
+        Service -> DB: Check next match in bracket
+        Service -> DB: Update next match (set team1/team2)
+        deactivate Service
+    end
+end
+
+Controller --> View: Success Message
+deactivate Controller
+View --> Admin: Redirect to Manage Matches (Updated List)
+deactivate View
+
+@enduml

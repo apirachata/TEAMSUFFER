@@ -40,6 +40,7 @@ if settings.DEBUG:
 urlpatterns += [
     path('tournaments/<int:pk>/detail/', tournaments_views.tournament_detail_view, name='tournament_detail'),
     path('tournaments/<int:pk>/register/create-team/', tournaments_views.create_team_and_register, name='tournament_create_team_register'),
+    path('tournaments/create/', tournaments_views.create_tournament_view, name='create_tournament'),
 ]
 
 # Frontend teams list (accessible at /teams/)

@@ -1,0 +1,314 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}สร้างการแข่งขัน - TEAMSUFFER{% endblock %}
+
+{% block content %}
+<div class="create-tournament-container">
+    <div class="form-header">
+        <h1><i class="fas fa-trophy"></i> สร้างการแข่งขันใหม่</h1>
+        <p>กรอกข้อมูลด้านล่างเพื่อสร้างทัวร์นาเมนต์</p>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" class="tournament-form">
+        {% csrf_token %}
+
+        <div class="form-section">
+            <h3><i class="fas fa-info-circle"></i> ข้อมูลพื้นฐาน</h3>
+
+            <div
+                style="background: rgba(67, 97, 238, 0.1); border: 1px solid rgba(67, 97, 238, 0.3); border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px;">
+                <i class="fas fa-magic" style="color: #4361ee; font-size: 1.2rem;"></i>
+                <div style="flex: 1;">
+                    <strong style="color: #4361ee; display: block; margin-bottom: 2px;">ต้องการตัวช่วยแบ่งทีม?</strong>
+                    <span
+                        style="font-size: 0.9rem; color: var(--text-secondary);">คุณสามารถใช้ระบบสุ่มทีมเพื่อจัดทีมก่อนเริ่มสร้างการแข่งขันได้</span>
+                </div>
+                <a href="{% url 'random_team_generator' %}" target="_blank" class="btn"
+                    style="background: #4361ee; color: white; padding: 6px 12px; font-size: 0.85rem;">
+                    <i class="fas fa-external-link-alt margin-right: 4px;"></i> เปิดโปรแกรมสุ่ม
+                </a>
+            </div>
+
+            <div class="form-group">
+                <label for="name">ชื่อการแข่งขัน <span class="required">*</span></label>
+                <input type="text" id="name" name="name" placeholder="เช่น Valorant Championship 2026" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="game_id">เกม</label>
+                    <select id="game_id" name="game_id">
+                        <option value="">-- เลือกเกม --</option>
+                        {% for game in games %}
+                        <option value="{{ game.id }}">{{ game.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="bracket_type">ประเภทสายการแข่ง</label>
+                    <select id="bracket_type" name="bracket_type">
+                        <option value="single">Single Elimination</option>
+                        <option value="double">Double Elimination</option>
+                        <option value="round_robin">Round Robin</option>
+                        <option value="mini">Mini League</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="description">รายละเอียด</label>
+                <textarea id="description" name="description" rows="4"
+                    placeholder="อธิบายเกี่ยวกับการแข่งขัน..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="rules">กติกา</label>
+                <textarea id="rules" name="rules" rows="4" placeholder="กติกาการแข่งขัน..."></textarea>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3><i class="fas fa-calendar-alt"></i> วันที่และจำนวนทีม</h3>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="start_date">วันที่เริ่ม <span class="required">*</span></label>
+                    <input type="datetime-local" id="start_date" name="start_date" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="end_date">วันที่สิ้นสุด <span class="required">*</span></label>
+                    <input type="datetime-local" id="end_date" name="end_date" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="max_teams">จำนวนทีมสูงสุด</label>
+                    <input type="number" id="max_teams" name="max_teams" value="16" min="2" max="128">
+                </div>
+
+                <div class="form-group">
+                    <label for="prize_pool">รางวัล</label>
+                    <input type="text" id="prize_pool" name="prize_pool" placeholder="เช่น ฿10,000">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h3><i class="fas fa-cog"></i> การตั้งค่า</h3>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="status">สถานะ</label>
+                    <select id="status" name="status">
+                        <option value="draft">Draft (ร่าง)</option>
+                        <option value="open">Open (เปิดรับสมัคร)</option>
+                        <option value="closed">Closed (ปิดรับสมัคร)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="featured_image">รูปภาพแบนเนอร์</label>
+                    <input type="file" id="featured_image" name="featured_image" accept="image/*">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a href="{% url 'home' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> ยกเลิก
+            </a>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-plus"></i> สร้างการแข่งขัน
+            </button>
+        </div>
+    </form>
+</div>
+
+<style>
+    :root {
+        --primary-color: #ff6b35;
+        --secondary-color: #004e89;
+        --dark-bg: #0a0e27;
+        --card-bg: #1a1f3a;
+        --text-primary: #ffffff;
+        --text-secondary: #b0b8c8;
+        --border-color: #2a3150;
+        --success-color: #4CAF50;
+        --error-color: #f44336;
+    }
+
+    .create-tournament-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+
+    .form-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .form-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        background: linear-gradient(135deg, var(--primary-color), #ff9f5a);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .form-header h1 i {
+        margin-right: 10px;
+    }
+
+    .form-header p {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+    }
+
+    .tournament-form {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 30px;
+    }
+
+    .form-section {
+        margin-bottom: 30px;
+        padding-bottom: 30px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .form-section:last-of-type {
+        border-bottom: none;
+        margin-bottom: 20px;
+        padding-bottom: 0;
+    }
+
+    .form-section h3 {
+        color: var(--primary-color);
+        margin-bottom: 20px;
+        font-size: 1.2rem;
+    }
+
+    .form-section h3 i {
+        margin-right: 8px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--text-primary);
+        font-weight: 500;
+    }
+
+    .form-group .required {
+        color: var(--error-color);
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="number"],
+    .form-group input[type="datetime-local"],
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 12px 15px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        color: var(--text-primary);
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+        color: var(--text-secondary);
+    }
+
+    .form-group input[type="file"] {
+        padding: 10px;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 24px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color), #ff5722);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(255, 107, 53, 0.4);
+    }
+
+    .btn-secondary {
+        background: var(--border-color);
+        color: var(--text-primary);
+    }
+
+    .btn-secondary:hover {
+        background: #3a4160;
+    }
+
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+
+        .form-actions {
+            flex-direction: column-reverse;
+        }
+
+        .btn {
+            width: 100%;
+        }
+
+        .form-header h1 {
+            font-size: 1.8rem;
+        }
+    }
+</style>
+{% endblock %}

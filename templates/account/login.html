@@ -1,68 +1,49 @@
 {% extends 'base.html' %}
 {% load i18n %}
-{% load social_helpers %}
+{% load account socialaccount %}
 {% load static %}
 
 {% block title %}เข้าสู่ระบบ - TEAMSUFFER{% endblock %}
 
 {% block content %}
 <style>
-    .login-wrapper {
+    .signup-wrapper {
         display: grid;
         grid-template-columns: 1fr 1fr;
         min-height: 100vh;
         background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
-        gap: 0;
     }
 
-    .login-left {
-        background: linear-gradient(135deg, rgba(255, 107, 53, 0.15) 0%, rgba(0, 78, 137, 0.1) 100%);
+    .signup-left {
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.3) 100%),
+        url('{% static "images/login-hero.jpg" %}') center/cover;
+        background-blend-mode: darken;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         padding: 40px 20px;
         position: relative;
-        overflow: hidden;
     }
 
-    .login-left::before {
+    .signup-left::before {
         content: '';
         position: absolute;
-        top: -50%;
-        right: -50%;
-        width: 600px;
-        height: 600px;
-        background: radial-gradient(circle, rgba(255, 107, 53, 0.1) 0%, transparent 70%);
-        border-radius: 50%;
-        animation: float 8s ease-in-out infinite;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, rgba(255, 107, 53, 0.05) 0%, rgba(0, 78, 137, 0.05) 100%);
     }
 
-    .login-left::after {
-        content: '';
-        position: absolute;
-        bottom: -30%;
-        left: -30%;
-        width: 400px;
-        height: 400px;
-        background: radial-gradient(circle, rgba(0, 78, 137, 0.1) 0%, transparent 70%);
-        border-radius: 50%;
-        animation: float 10s ease-in-out infinite reverse;
-    }
-
-    @keyframes float {
-        0%, 100% { transform: translateY(0px); }
-        50% { transform: translateY(20px); }
-    }
-
-    .login-left-content {
+    .signup-left-content {
         position: relative;
         z-index: 2;
         text-align: center;
         color: #fff;
     }
 
-    .login-logo {
+    .signup-logo {
         font-size: 2.5rem;
         font-weight: bold;
         margin-bottom: 20px;
@@ -73,66 +54,38 @@
         gap: 10px;
     }
 
-    .login-logo i {
+    .signup-logo i {
         font-size: 4rem;
-        animation: pulse 2s ease-in-out infinite;
     }
 
-    @keyframes pulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.1); }
-    }
-
-    .login-tagline {
+    .signup-tagline {
         font-size: 1.1rem;
         color: rgba(255, 255, 255, 0.8);
         margin-top: 20px;
         line-height: 1.6;
     }
 
-    .login-right {
+    .signup-right {
         display: flex;
         align-items: center;
         justify-content: center;
         padding: 40px 20px;
-        background: rgba(15, 18, 35, 0.95);
-        position: relative;
-        overflow: hidden;
+        background: rgba(15, 18, 35, 0.9);
+        overflow-y: auto;
+        max-height: 100vh;
     }
 
-    .login-right::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 200px;
-        height: 200px;
-        background: radial-gradient(circle, rgba(255, 107, 53, 0.05) 0%, transparent 70%);
-        border-radius: 50%;
-    }
-
-    .login-form-container {
+    .signup-form-container {
         width: 100%;
         max-width: 380px;
-        position: relative;
-        z-index: 1;
+        padding: 10px 0;
     }
 
-    .login-form-title {
+    .signup-form-title {
         font-size: 2rem;
         color: #fff;
-        margin-bottom: 8px;
-        font-weight: 700;
-        background: linear-gradient(135deg, var(--primary-color) 0%, #ff9f5a 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-
-    .login-subtitle {
-        color: rgba(255, 255, 255, 0.5);
-        font-size: 0.9rem;
         margin-bottom: 30px;
+        font-weight: 700;
     }
 
     .form-group {
@@ -145,82 +98,71 @@
         color: #cbd6ef;
         font-size: 0.95rem;
         margin-bottom: 8px;
-        font-weight: 600;
-        text-transform: capitalize;
+        font-weight: 500;
     }
 
-    .form-group input {
-        padding: 14px 16px;
-        background: rgba(255, 255, 255, 0.06);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: 8px;
+    .form-group input,
+    .form-group textarea {
+        padding: 12px 14px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 6px;
         color: #fff;
         font-size: 1rem;
         transition: all 0.3s ease;
+        font-family: inherit;
     }
 
-    .form-group input:focus {
+    .form-group input:focus,
+    .form-group textarea:focus {
         outline: none;
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.12);
         border-color: var(--primary-color);
-        box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.15);
+        box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.1);
     }
 
-    .form-group input::placeholder {
-        color: rgba(255, 255, 255, 0.35);
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+        color: rgba(255, 255, 255, 0.4);
     }
 
-    .form-links {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 24px;
-        font-size: 0.9rem;
+    .help-text {
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 0.8rem;
+        margin-top: 4px;
+        line-height: 1.4;
     }
 
-    .form-links a {
-        color: var(--primary-color);
-        text-decoration: none;
-        transition: color 0.3s ease;
+    .errorlist {
+        list-style: none;
+        padding: 0;
+        margin: 6px 0 0 0;
+        color: #ff6b35;
+        font-size: 0.85rem;
     }
 
-    .form-links a:hover {
-        color: #ff9f5a;
+    .errorlist li {
+        margin-bottom: 4px;
     }
 
-    .login-button {
+    .signup-button {
         width: 100%;
-        padding: 14px 16px;
+        padding: 12px 16px;
         background: linear-gradient(135deg, var(--primary-color) 0%, #ff9f5a 100%);
         color: #fff;
         border: none;
-        border-radius: 8px;
+        border-radius: 6px;
         font-size: 1rem;
         font-weight: 700;
         cursor: pointer;
         transition: all 0.3s ease;
+        margin-top: 12px;
         margin-bottom: 18px;
-        position: relative;
-        overflow: hidden;
     }
 
-    .login-button::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: rgba(255, 255, 255, 0.2);
-        transition: left 0.4s ease;
-    }
-
-    .login-button:hover {
+    .signup-button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 12px 28px rgba(255, 107, 53, 0.35);
-    }
-
-    .login-button:hover::before {
-        left: 100%;
+        box-shadow: 0 8px 20px rgba(255, 107, 53, 0.4);
     }
 
     .divider {
@@ -251,10 +193,10 @@
         align-items: center;
         justify-content: center;
         gap: 10px;
-        padding: 14px 16px;
-        background: rgba(255, 255, 255, 0.06);
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: 8px;
+        padding: 12px 16px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 6px;
         color: #fff;
         text-decoration: none;
         font-weight: 600;
@@ -262,26 +204,20 @@
     }
 
     .social-btn:hover {
-        background: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.12);
         border-color: var(--primary-color);
-        transform: translateY(-2px);
     }
 
     .social-icon {
-        background: rgba(255, 255, 255, 0.15);
+        background: rgba(255, 255, 255, 0.1);
         border-radius: 50%;
-        width: 22px;
-        height: 22px;
+        width: 20px;
+        height: 20px;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 0.9rem;
         font-weight: 700;
-        transition: all 0.3s ease;
-    }
-
-    .social-btn:hover .social-icon {
-        transform: scale(1.15);
     }
 
     .social-btn.google .social-icon {
@@ -289,116 +225,119 @@
         color: #4285F4;
     }
 
-    .signup-link {
+    .login-link {
         text-align: center;
         color: rgba(255, 255, 255, 0.7);
         font-size: 0.9rem;
     }
 
-    .signup-link a {
+    .login-link a {
         color: var(--primary-color);
         text-decoration: none;
         font-weight: 600;
     }
 
-    .signup-link a:hover {
+    .login-link a:hover {
         color: #ff9f5a;
     }
 
-    .error-message {
-        color: #ff6b35;
-        font-size: 0.85rem;
-        margin-top: 6px;
-    }
-
     @media (max-width: 768px) {
-        .login-wrapper {
+        .signup-wrapper {
             grid-template-columns: 1fr;
         }
 
-        .login-left {
+        .signup-left {
             display: none;
         }
 
-        .login-form-title {
+        .signup-form-title {
             font-size: 1.5rem;
         }
 
-        .login-form-container {
+        .signup-form-container {
             max-width: 100%;
+        }
+
+        .signup-right {
+            max-height: none;
+            padding: 20px;
         }
     }
 </style>
 
-<div class="login-wrapper">
-    <div class="login-left">
-        <div class="login-left-content">
-            <div class="login-logo">
+<div class="signup-wrapper">
+    <div class="signup-left">
+        <div class="signup-left-content">
+            <div class="signup-logo">
                 <i class="fas fa-trophy"></i>
                 <span>TEAMSUFFER</span>
             </div>
-            <p class="login-tagline">
-                ระบบจัดการทัวร์นาเมนต์ esports<br>
-                สำหรับทีมกีฬาอิเล็กทรอนิกส์
+            <p class="signup-tagline">
+                ยินดีต้อนรับกลับสู่สังเวียน<br>
+                เข้าสู่ระบบเพื่อจัดการทีมและการแข่งขันของคุณ
             </p>
         </div>
     </div>
 
-    <div class="login-right">
-        <div class="login-form-container">
-            <h1 class="login-form-title">เข้าสู่ระบบ</h1>
-            <p class="login-subtitle">ดำเนินการแข่งขันของคุณต่อ</p>
+    <div class="signup-right">
+        <div class="signup-form-container">
+            <h1 class="signup-form-title">Login</h1>
+
+            {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+            {% endif %}
 
             <form method="post" action="{% url 'account_login' %}">
                 {% csrf_token %}
 
                 {% for field in form %}
-                    {% if field.name != 'remember' %}
-                        <div class="form-group">
-                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                            {{ field }}
-                            {% if field.errors %}
-                                <div class="error-message">{{ field.errors.0 }}</div>
-                            {% endif %}
-                        </div>
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                    <p class="help-text">{{ field.help_text|safe }}</p>
                     {% endif %}
+                    {% if field.errors %}
+                    {{ field.errors }}
+                    {% endif %}
+                </div>
                 {% endfor %}
 
                 {% if form.non_field_errors %}
-                    <div class="error-message">{{ form.non_field_errors.0 }}</div>
-                {% endif %}
-
-                <div class="form-links">
-                    <a href="{% url 'account_reset_password' %}">Forgot Password?</a>
+                <div class="errorlist">
+                    {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
                 </div>
-
-                <button type="submit" class="login-button">เข้าสู่ระบบ</button>
-
-                {% social_apps as social_providers %}
-                {% if social_providers %}
-                    <div class="divider">หรือ</div>
-                    <div class="social-buttons">
-                        {% for provider in social_providers %}
-                            <a href="{% provider_login_url provider.provider %}" class="social-btn {% if provider.provider == 'google' %}google{% endif %}">
-                                <span class="social-icon">
-                                    {% if provider.provider == 'google' %}
-                                        G
-                                    {% else %}
-                                        {{ provider.provider|slice:":1"|upper }}
-                                    {% endif %}
-                                </span>
-                                <span>Sign in with {{ provider.get_provider_display }}</span>
-                            </a>
-                        {% endfor %}
-                    </div>
                 {% endif %}
 
-                <div class="signup-link">
+                <button type="submit" class="signup-button">Sign In</button>
+
+                {% get_providers as social_providers %}
+                {% if social_providers %}
+                <div class="divider">or</div>
+                <div class="social-buttons">
+                    {% for provider in social_providers %}
+                    <a href="{% provider_login_url provider.provider process='login' %}"
+                        class="social-btn {% if provider.provider == 'google' %}google{% endif %}">
+                        <span class="social-icon">
+                            {% if provider.provider == 'google' %}
+                            G
+                            {% else %}
+                            {{ provider.provider|slice:":1"|upper }}
+                            {% endif %}
+                        </span>
+                        <span>Sign in with {{ provider.name }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="login-link">
                     Don't have an account? <a href="{% url 'account_signup' %}">Sign up here</a>
                 </div>
             </form>
         </div>
     </div>
 </div>
-
 {% endblock %}

@@ -10,11 +10,24 @@
         <div class="header-content">
             <h1>ยินดีต้อนรับนักสู้อีสปอร์ต</h1>
             <p>ค้นหาและสร้างทัวร์นาเมนต์กีฬาอิเล็กทรอนิกส์ของคุณ</p>
-            <div style="margin-top: 20px;">
+            <div style="margin-top: 20px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
                 <a href="{% url 'random_team_generator' %}" class="btn btn-primary"
                     style="display:inline-block; width:auto; background: linear-gradient(90deg, #4cc9f0, #4361ee); border:none;">
                     <i class="fas fa-random me-2"></i> Random Team Generator
                 </a>
+                {% if user.is_authenticated %}
+                {% if user.is_superuser or user.is_staff %}
+                <a href="{% url 'create_tournament' %}" class="btn btn-primary"
+                    style="display:inline-block; width:auto; background: linear-gradient(90deg, #ff6b35, #ff9f5a); border:none;">
+                    <i class="fas fa-plus me-2"></i> สร้างการแข่งขัน
+                </a>
+                {% elif user.profile and user.profile.role == 'tournament_admin' %}
+                <a href="{% url 'create_tournament' %}" class="btn btn-primary"
+                    style="display:inline-block; width:auto; background: linear-gradient(90deg, #ff6b35, #ff9f5a); border:none;">
+                    <i class="fas fa-plus me-2"></i> สร้างการแข่งขัน
+                </a>
+                {% endif %}
+                {% endif %}
             </div>
         </div>
     </div>
@@ -109,6 +122,7 @@
                             <i class="fas fa-users"></i>
                             <span id="teams-{{ tournament.id }}">{{ tournament.registrations.count }}</span>/{{
                             tournament.max_teams|default:"-" }}
+                        </span>
                     </div>
                 </div>
                 <div class="card-action" style="display: flex; gap: 10px;">
@@ -534,11 +548,6 @@
         color: var(--text-primary);
         text-decoration: none;
         transition: all 0.3s ease;
-    }
-
-    .page-link:hover {
-        background: var(--primary-color);
-        border-color: var(--primary-color);
     }
 
     .page-link.active {

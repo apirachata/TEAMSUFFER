@@ -32,6 +32,72 @@
 
     {% block content %}{% endblock %}
 
+    <!-- Toast Notifications Container -->
+    <div id="toast-container"
+        style="position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px;">
+        {% if messages %}
+        {% for message in messages %}
+        <div class="toast-notification toast-{{ message.tags }}" style="padding: 15px 25px; border-radius: 8px; color: white; font-weight: 500; 
+                   box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 10px;
+                   animation: slideIn 0.3s ease-out;
+                   {% if message.tags == 'error' %}background: linear-gradient(135deg, #dc3545, #c82333);
+                   {% elif message.tags == 'success' %}background: linear-gradient(135deg, #28a745, #1e7e34);
+                   {% elif message.tags == 'warning' %}background: linear-gradient(135deg, #ffc107, #e0a800); color: #000;
+                   {% elif message.tags == 'info' %}background: linear-gradient(135deg, #17a2b8, #138496);
+                   {% else %}background: linear-gradient(135deg, #6c757d, #545b62);{% endif %}">
+            <i
+                class="fas {% if message.tags == 'error' %}fa-times-circle{% elif message.tags == 'success' %}fa-check-circle{% elif message.tags == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %}"></i>
+            <span>{{ message }}</span>
+            <button onclick="this.parentElement.remove();"
+                style="background: none; border: none; color: inherit; cursor: pointer; margin-left: auto; opacity: 0.7;">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+
+    <style>
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+    </style>
+
+    <script>
+        // Auto-dismiss toasts after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const toasts = document.querySelectorAll('.toast-notification');
+            toasts.forEach(function(toast) {
+                setTimeout(function() {
+                    toast.style.animation = 'fadeOut 0.3s ease-out forwards';
+                    setTimeout(function() {
+                        toast.remove();
+                    }, 300);
+                }, 5000);
+            });
+        });
+    </script>
+
     <footer class="footer">
         <p>&copy; 2025 TEAMSUFFER. All rights reserved.</p>
     </footer>

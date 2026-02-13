@@ -8,14 +8,14 @@
   style="max-width:1000px;margin:40px auto;padding:24px;background:linear-gradient(135deg,#1f2340,#352147);border-radius:12px;color:#fff">
   <h2 style="margin-bottom:12px">รายการทีม</h2>
 
-  <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px">
+  <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
     <input id="searchTeam" placeholder="ค้นหาชื่อทีม"
-      style="flex:1;padding:10px;border-radius:8px;border:none;background:rgba(255,255,255,0.03);color:#fff">
-    <select id="gameFilter"
-      style="width:200px;padding:10px;border-radius:8px;border:none;background:rgba(255,255,255,0.03);color:#fff;outline:none;border:1px solid rgba(255,255,255,0.1);">
-      <option value="">ทั้งหมด (เลือกเกม)</option>
-      {% for game in games %}
-      <option value="{{ game.id }}">{{ game.name }}</option>
+      style="flex:1;min-width:200px;padding:10px;border-radius:8px;border:none;background:rgba(255,255,255,0.08);color:#fff">
+    <select id="tournamentFilter"
+      style="width:200px;padding:10px;border-radius:8px;border:1px solid rgba(99,102,241,0.5);background:#2a2f55;color:#a5b4fc;outline:none;cursor:pointer;">
+      <option value="" style="background:#1e2340;color:#a5b4fc">ทุกรายการ (เลือกรายการ)</option>
+      {% for t in tournaments %}
+      <option value="{{ t.name }}" style="background:#1e2340;color:#fff">{{ t.name }}</option>
       {% endfor %}
     </select>
   </div>
@@ -25,47 +25,65 @@
       <thead>
         <tr style="text-align:left;color:#9fb6ff">
           <th style="padding:10px 12px">ชื่อทีม</th>
-          <th style="padding:10px 12px;width:160px">จำนวนสมาชิก</th>
-          <th style="padding:10px 12px;width:140px">สถานะ</th>
-          <th style="padding:10px 12px;width:220px"></th>
+          <th style="padding:10px 12px;width:180px">รายการแข่ง</th>
+          <th style="padding:10px 12px;width:120px">จำนวนสมาชิก</th>
+          <th style="padding:10px 12px;width:100px">สถานะ</th>
+          <th style="padding:10px 12px;width:150px"></th>
         </tr>
       </thead>
       <tbody id="teamsTable">
         {% for team in teams %}
         <tr class="team-row" data-name="{{ team.name|lower }}" data-game-id="{{ team.game.id|default:'' }}"
+          data-tournament="{{ team.tournament_name|default:''|lower }}"
           style="border-top:1px solid rgba(255,255,255,0.03)">
           <td style="padding:12px">
-            {{ team.name }}
+            <a href="{% url 'team_detail' team.id %}" style="color:white;text-decoration:none;font-weight:bold;">
+              {{ team.name }}
+            </a>
             {% if team.game %}
             <div style="font-size:0.85rem;color:#bbb;margin-top:4px;">{{ team.game.name }}</div>
+            {% endif %}
+          </td>
+          <td style="padding:12px">
+            {% if team.tournament_name %}
+            <span style="color:#ffd700;font-size:0.9rem">{{ team.tournament_name }}</span>
+            {% else %}
+            <span style="color:#666">-</span>
             {% endif %}
           </td>
           <td style="padding:12px">{{ team.member_count }} / 6</td>
           <td style="padding:12px">{% if team.member_count|default:0 < 6 %}เปิดรับ{% else %}เต็ม{% endif %}</td>
           <td style="padding:12px">
-            {% if team.member_count|default:0 < 6 %} <form method="post"
-              style="display:flex;gap:8px;align-items:center">
+            {% if request.user.is_superuser %}
+            <!-- Admin sees approve/reject/delete buttons -->
+            <a href="{% url 'approve_team' team.id %}" onclick="return confirm('อนุมัติทีม {{ team.name }}?');"
+              style="padding:6px 12px;background:#28a745;color:white;text-decoration:none;border-radius:6px;font-size:0.85rem;margin-right:6px;">
+              อนุมัติ
+            </a>
+            <a href="{% url 'reject_team' team.id %}" onclick="return confirm('ปฏิเสธทีม {{ team.name }}?');"
+              style="padding:6px 12px;background:#ffc107;color:#000;text-decoration:none;border-radius:6px;font-size:0.85rem;margin-right:6px;">
+              ปฏิเสธ
+            </a>
+            <a href="{% url 'delete_team' team.id %}" onclick="return confirm('ยืนยันลบทีม {{ team.name }}?');"
+              style="padding:6px 12px;background:#dc3545;color:white;text-decoration:none;border-radius:6px;font-size:0.85rem;">
+              ลบ
+            </a>
+            {% else %}
+            <!-- Regular users see join button -->
+            {% if team.member_count|default:0 < 6 %} <form method="post" style="display:inline">
               {% csrf_token %}
               <input type="hidden" name="team_id" value="{{ team.id }}">
-              <input class="form-join-code" name="join_code" placeholder="รหัส (ถ้ามี)"
-                style="padding:8px;border-radius:6px;border:none;background:rgba(255,255,255,0.03);color:#fff">
-              <button class="btn btn-primary" type="submit">เข้าร่วม</button>
+              <button class="btn btn-primary" type="submit" style="padding:6px 14px">เข้าร่วม</button>
               </form>
               {% else %}
-              <span style="color:#999">ไม่สามารถเข้าร่วม</span>
+              <span style="color:#999">เต็มแล้ว</span>
               {% endif %}
-              {% if request.user.is_superuser %}
-              <a href="{% url 'delete_team' team.id %}" class="btn btn-sm btn-danger ms-2"
-                onclick="return confirm('ADMIN: ยืนยันการลบทีม {{ team.name }}?');"
-                style="padding:6px 12px;background:#dc3545;color:white;text-decoration:none;border-radius:6px;font-size:0.8rem;margin-left:8px;">
-                Delete
-              </a>
               {% endif %}
           </td>
         </tr>
         {% empty %}
         <tr>
-          <td colspan="4" style="padding:18px;color:#bbb">ยังไม่มีทีม</td>
+          <td colspan="5" style="padding:18px;color:#bbb">ยังไม่มีทีม</td>
         </tr>
         {% endfor %}
       </tbody>
@@ -75,27 +93,25 @@
 
 <script>
   const search = document.getElementById('searchTeam');
-  const gameFilter = document.getElementById('gameFilter');
+  const tournamentFilter = document.getElementById('tournamentFilter');
 
   function filterTeams() {
     const q = search.value.trim().toLowerCase();
-    const g = gameFilter.value;
+    const t = tournamentFilter.value.toLowerCase();
 
     document.querySelectorAll('.team-row').forEach(r => {
       const name = r.dataset.name || '';
-      // data-game-id might be empty string if None
-      const gameId = r.dataset.gameId || '';
+      const tournament = r.dataset.tournament || '';
 
       const matchName = name.includes(q);
-      const matchGame = (g === "" || gameId === g);
+      const matchTournament = (t === "" || tournament.includes(t));
 
-      r.style.display = (matchName && matchGame) ? '' : 'none';
+      r.style.display = (matchName && matchTournament) ? '' : 'none';
     });
   }
 
-  // Update rows on input
   search.addEventListener('input', filterTeams);
-  gameFilter.addEventListener('change', filterTeams);
+  tournamentFilter.addEventListener('change', filterTeams);
 </script>
 
 {% endblock %}

@@ -1,0 +1,593 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}หน้าหลัก - TEAMSUFFER{% endblock %}
+
+{% block content %}
+<div class="home-container">
+    <!-- Header Section -->
+    <div class="header-section">
+        <div class="header-content">
+            <h1>ยินดีต้อนรับนักสู้อีสปอร์ต</h1>
+            <p>ค้นหาและสร้างทัวร์นาเมนต์กีฬาอิเล็กทรอนิกส์ของคุณ</p>
+            <div style="margin-top: 20px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+
+                {% if can_create_tournament %}
+                <a href="{% url 'create_tournament' %}" class="btn btn-primary"
+                    style="display:inline-block; width:auto; background: linear-gradient(90deg, #ff6b35, #ff9f5a); border:none;">
+                    <i class="fas fa-plus me-2"></i> สร้างการแข่งขัน
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="search-filter-section">
+        <form method="GET" action="{% url 'home' %}" style="display:flex; gap:15px; width:100%; flex-wrap:wrap;">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" name="q" value="{{ search_query|default:'' }}"
+                    placeholder="ค้นหาชื่อรายการ หรือ เกม...">
+            </div>
+
+            <div class="filter-controls">
+                <select name="game_id" onchange="this.form.submit()">
+                    <option value="">ทุกเกม</option>
+                    {% for g in games %}
+                    <option value="{{ g.id }}" {% if g.is_selected %}selected{% endif %}>{{ g.name }}</option>
+                    {% endfor %}
+                </select>
+
+                <a href="{% url 'home' %}" class="btn"
+                    style="background:#555; color:white; width:auto; text-decoration:none; padding:12px 15px;">ล้างค่า</a>
+            </div>
+            <!-- Hidden inputs to preserve other filters if needed -->
+        </form>
+    </div>
+
+
+    <!-- Tournaments Grid -->
+    <div class="tournaments-section">
+        <h2 class="section-title">โปรดเลือกรายการที่ต้องการจะแข่ง</h2>
+        {% if featured_tournament and featured_tournament.featured_image %}
+        <div style="display:flex;align-items:center;gap:18px;margin-bottom:22px;">
+            <a href="{% url 'tournament_detail' featured_tournament.id %}"
+                style="display:block;max-width:340px;flex:0 0 340px;border-radius:12px;overflow:hidden;">
+                <img src="{{ featured_tournament.featured_image.url }}" alt="{{ featured_tournament.name }}"
+                    style="width:100%;height:200px;object-fit:cover;display:block;border-radius:8px;">
+            </a>
+            <div style="color:var(--text-secondary);">
+                <h3 style="color:var(--text-primary);margin:0 0 8px 0">{{ featured_tournament.name }}</h3>
+                <p style="margin:0">{{ featured_tournament.featured_description|linebreaksbr }}</p>
+                <p style="margin-top:10px"><a href="{% url 'tournament_detail' featured_tournament.id %}"
+                        class="btn btn-primary" style="width:auto;padding:8px 14px">ดูรายละเอียด</a></p>
+            </div>
+        </div>
+        {% endif %}
+        <div class="tournaments-grid" id="tournamentsGrid">
+            {% for tournament in tournaments %}
+            <div class="tournament-card" data-game="{{ tournament.game_title|lower }}"
+                data-status="{{ tournament.status }}">
+                <div class="card-image">
+                    {% if tournament.game and tournament.game.image %}
+                    <img src="{{ tournament.game.image.url }}" alt="{{ tournament.game.name }}">
+                    {% elif tournament.game_title == "Valorant" %}
+                    <img src="{% static 'images/login-hero.jpg' %}" alt="Valorant">
+                    <div class="badge badge-new">ใหม่</div>
+                    {% elif tournament.game_title == "League of Legends" %}
+                    <img src="{% static 'images/login-hero.jpg' %}" alt="League of Legends">
+                    <div class="badge badge-hot">ร้อน</div>
+                    {% else %}
+                    <img src="{% static 'images/login-hero.jpg' %}" alt="{{ tournament.name }}">
+                    {% endif %}
+                    <span class="status-badge status-{{ tournament.status }}">
+                        {% if tournament.status == 'open' %}เปิดรับสมัคร
+                        {% elif tournament.status == 'closed' %}ปิดรับสมัคร
+                        {% elif tournament.status == 'ongoing' %}กำลังแข่งขัน
+                        {% elif tournament.status == 'finished' %}สิ้นสุดแล้ว
+                        {% else %}{{ tournament.status }}
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="card-content">
+                    <h3 class="tournament-name">{{ tournament.name }}</h3>
+                    <p class="game-title">
+                        <i class="fas fa-gamepad"></i>
+                        {% if tournament.game %}
+                        {{ tournament.game.name }}
+                        {% else %}
+                        {{ tournament.game_title }}
+                        {% endif %}
+                    </p>
+                    {% if tournament.prize_pool %}
+                    <div class="prize-info">
+                        <i class="fas fa-coins"></i>
+                        <span class="prize-amount">{{ tournament.prize_pool }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="tournament-meta">
+                        <span class="meta-item">
+                            <i class="fas fa-calendar"></i>
+                            {{ tournament.start_date|date:"j M Y" }}
+                        </span>
+                        <span class="meta-item">
+                            <i class="fas fa-users"></i>
+                            <span id="teams-{{ tournament.id }}">{{ tournament.registrations.count }}</span>/{{ tournament.max_teams|default:"-" }}
+                        </span>
+                    </div>
+                </div>
+                <div class="card-action">
+                    <a href="{% url 'tournament_detail' tournament.id %}" class="btn btn-primary">ดูรายละเอียด</a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state" style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
+                <i class="fas fa-inbox" style="font-size: 48px; color: #999; margin-bottom: 20px;"></i>
+                <p style="color: #666; font-size: 18px;">ไม่มีทัวร์นาเมนต์ในขณะนี้</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    {% if tournaments.has_other_pages %}
+    <div class="pagination">
+        {% if tournaments.has_previous %}
+        <a href="?page=1" class="page-link">«</a>
+        <a href="?page={{ tournaments.previous_page_number }}" class="page-link">‹</a>
+        {% endif %}
+
+        {% for num in tournaments.paginator.page_range %}
+        {% if tournaments.number == num %}
+        <span class="page-link active">{{ num }}</span>
+        {% else %}
+        <a href="?page={{ num }}" class="page-link">{{ num }}</a>
+        {% endif %}
+        {% endfor %}
+
+        {% if tournaments.has_next %}
+        <a href="?page={{ tournaments.next_page_number }}" class="page-link">›</a>
+        <a href="?page={{ tournaments.paginator.num_pages }}" class="page-link">»</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    :root {
+        --primary-color: #ff6b35;
+        --secondary-color: #004e89;
+        --dark-bg: #0a0e27;
+        --card-bg: #1a1f3a;
+        --text-primary: #ffffff;
+        --text-secondary: #b0b8c8;
+        --border-color: #2a3150;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+        color: var(--text-primary);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        min-height: 100vh;
+    }
+
+    .navbar {
+        background: rgba(15, 18, 35, 0.95);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--border-color);
+        padding: 1rem 0;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    .navbar-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 20px;
+    }
+
+    .navbar-logo {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: var(--primary-color);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .navbar-menu {
+        display: flex;
+        list-style: none;
+        gap: 2rem;
+        align-items: center;
+    }
+
+    .nav-link {
+        color: var(--text-secondary);
+        text-decoration: none;
+        transition: color 0.3s ease;
+        font-size: 0.95rem;
+    }
+
+    .nav-link:hover {
+        color: var(--primary-color);
+    }
+
+    .login-btn {
+        background: var(--primary-color);
+        color: white !important;
+        padding: 0.5rem 1.5rem;
+        border-radius: 5px;
+        transition: background 0.3s ease;
+    }
+
+    .login-btn:hover {
+        background: #ff5722;
+        color: white !important;
+    }
+
+    .logout-btn {
+        background: #dc3545;
+        color: white !important;
+        padding: 0.5rem 1.5rem;
+        border-radius: 5px;
+    }
+
+    .home-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+
+    .header-section {
+        text-align: center;
+        margin-bottom: 60px;
+    }
+
+    .header-content h1 {
+        font-size: 3rem;
+        margin-bottom: 10px;
+        background: linear-gradient(135deg, var(--primary-color), #ff9f5a);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .header-content p {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+    }
+
+    .search-filter-section {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 40px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .search-box {
+        flex: 1;
+        min-width: 250px;
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .search-box i {
+        position: absolute;
+        left: 15px;
+        color: var(--text-secondary);
+    }
+
+    .search-box input {
+        width: 100%;
+        padding: 12px 15px 12px 45px;
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        color: var(--text-primary);
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+    }
+
+    .search-box input::placeholder {
+        color: var(--text-secondary);
+    }
+
+    .search-box input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+    }
+
+    .filter-controls {
+        display: flex;
+        gap: 15px;
+    }
+
+    .filter-controls select {
+        padding: 12px 15px;
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        color: var(--text-primary);
+        font-size: 1rem;
+        cursor: pointer;
+        transition: border-color 0.3s ease;
+    }
+
+    .filter-controls select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+        margin-bottom: 30px;
+        color: var(--text-primary);
+    }
+
+    .tournaments-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 25px;
+        margin-bottom: 40px;
+    }
+
+    .tournament-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .tournament-card:hover {
+        transform: translateY(-8px);
+        border-color: var(--primary-color);
+        box-shadow: 0 8px 32px rgba(255, 107, 53, 0.2);
+    }
+
+    .card-image {
+        position: relative;
+        width: 100%;
+        height: 180px;
+        overflow: hidden;
+        background: linear-gradient(135deg, #2a3150, #3a4560);
+    }
+
+    .card-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .tournament-card:hover .card-image img {
+        transform: scale(1.05);
+    }
+
+    .badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .badge-new {
+        background: #4CAF50;
+        color: white;
+    }
+
+    .badge-hot {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .status-badge {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        padding: 6px 12px;
+        border-radius: 5px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    .status-open {
+        background: #4CAF50;
+        color: white;
+    }
+
+    .status-closed {
+        background: #f44336;
+        color: white;
+    }
+
+    .status-ongoing {
+        background: #2196F3;
+        color: white;
+    }
+
+    .status-finished {
+        background: #757575;
+        color: white;
+    }
+
+    .card-content {
+        padding: 20px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .tournament-name {
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+        color: var(--text-primary);
+        line-height: 1.3;
+    }
+
+    .game-title {
+        font-size: 0.9rem;
+        color: var(--primary-color);
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .prize-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+        padding: 8px 12px;
+        background: rgba(255, 107, 53, 0.1);
+        border-radius: 6px;
+        width: fit-content;
+    }
+
+    .prize-amount {
+        color: var(--primary-color);
+        font-weight: bold;
+    }
+
+    .tournament-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: auto;
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .meta-item i {
+        color: var(--primary-color);
+    }
+
+    .card-action {
+        padding: 15px 20px;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        border: none;
+        text-align: center;
+        width: 100%;
+    }
+
+    .btn-primary {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #ff5722;
+        transform: scale(1.02);
+    }
+
+    .empty-state {
+        color: var(--text-secondary);
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 40px;
+    }
+
+    .page-link {
+        padding: 10px 15px;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        color: var(--text-primary);
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .page-link:hover {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .page-link.active {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .footer {
+        background: rgba(15, 18, 35, 0.95);
+        border-top: 1px solid var(--border-color);
+        padding: 30px 20px;
+        text-align: center;
+        color: var(--text-secondary);
+        margin-top: 60px;
+    }
+
+    @media (max-width: 768px) {
+        .navbar-menu {
+            gap: 1rem;
+        }
+
+        .header-content h1 {
+            font-size: 2rem;
+        }
+
+        .search-filter-section {
+            flex-direction: column;
+        }
+
+        .search-box {
+            min-width: 100%;
+        }
+
+        .filter-controls {
+            width: 100%;
+            flex-direction: column;
+        }
+
+        .filter-controls select {
+            width: 100%;
+        }
+
+        .tournaments-grid {
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+    }
+</style>
+{% endblock %}

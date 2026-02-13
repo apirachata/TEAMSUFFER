@@ -116,6 +116,23 @@ def create_team_and_register(request, pk):
     """Show a Create Team form; on submit create the team, make the user the leader, then register for tournament."""
     tournament = get_object_or_404(Tournament, pk=pk)
 
+    # Check if user is already in ANY team
+    from teams.models import TeamMember
+    existing_membership = TeamMember.objects.filter(user=request.user).select_related('team').first()
+    if existing_membership:
+        messages.error(request, f'คุณอยู่ในทีม "{existing_membership.team.name}" อยู่แล้ว กรุณาออกจากทีมก่อนจึงจะสมัครแข่งได้')
+        return redirect('tournament_detail', pk=pk)
+
+    # Check if user already has a team registered in this tournament
+    existing_registration = TournamentRegistration.objects.filter(
+        tournament=tournament,
+        team__created_by=request.user
+    ).exists()
+    
+    if existing_registration:
+        messages.error(request, 'คุณได้สร้างทีมสำหรับรายการนี้แล้ว ไม่สามารถสร้างได้มากกว่า 1 ทีมต่อรายการ')
+        return redirect('tournament_detail', pk=pk)
+
     if request.method == 'POST':
         team_name = request.POST.get('team_name')
         if not team_name:
@@ -233,11 +250,15 @@ def tournament_bracket_view(request, pk):
     # Check if we should show standings (Round Robin)
     show_standings = (tournament.bracket_type == 'round_robin')
     
+    registrations = TournamentRegistration.objects.filter(tournament=tournament, status='approved').select_related('team')
+    teams = [reg.team for reg in registrations]
+
     return render(request, 'tournaments/bracket.html', {
         'tournament': tournament, 
         'rounds': sorted_rounds, 
         'matches': matches,
-        'show_standings': show_standings
+        'show_standings': show_standings,
+        'teams': teams
     })
 
 
@@ -374,12 +395,91 @@ def random_team_generator_view(request):
 
 
 @login_required
+def create_tournament_view(request):
+    """Admin view to create a new tournament."""
+    # Check permission - only admin/staff/tournament_admin can create tournaments
+    is_admin = request.user.is_superuser or request.user.is_staff
+    if hasattr(request.user, 'profile'):
+        is_admin = is_admin or request.user.profile.role == 'tournament_admin'
+    
+    if not is_admin:
+        messages.error(request, 'คุณไม่มีสิทธิ์สร้างการแข่งขัน')
+        return redirect('home')
+    
+    games = Game.objects.all().order_by('name')
+    
+    if request.method == 'POST':
+        name = request.POST.get('name', '').strip()
+        game_id = request.POST.get('game_id')
+        description = request.POST.get('description', '').strip()
+        rules = request.POST.get('rules', '').strip()
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+        max_teams = request.POST.get('max_teams', 16)
+        prize_pool = request.POST.get('prize_pool', '').strip()
+        status = request.POST.get('status', 'draft')
+        bracket_type = request.POST.get('bracket_type', 'single')
+        
+        # Validation
+        if not name:
+            messages.error(request, 'กรุณากรอกชื่อการแข่งขัน')
+            return render(request, 'tournaments/create_tournament.html', {'games': games})
+        
+        if not start_date or not end_date:
+            messages.error(request, 'กรุณากรอกวันที่เริ่มและสิ้นสุด')
+            return render(request, 'tournaments/create_tournament.html', {'games': games})
+        
+        try:
+            max_teams = int(max_teams)
+        except ValueError:
+            max_teams = 16
+        
+        # Get game if selected
+        game = None
+        if game_id:
+            try:
+                game = Game.objects.get(pk=game_id)
+            except Game.DoesNotExist:
+                pass
+        
+        # Create tournament
+        tournament = Tournament.objects.create(
+            name=name,
+            game=game,
+            game_title=game.name if game else '',
+            description=description,
+            rules=rules,
+            start_date=start_date,
+            end_date=end_date,
+            max_teams=max_teams,
+            prize_pool=prize_pool,
+            status=status,
+            bracket_type=bracket_type,
+            created_by=request.user
+        )
+        
+        # Handle featured image upload
+        if 'featured_image' in request.FILES:
+            tournament.featured_image = request.FILES['featured_image']
+            tournament.save()
+        
+        messages.success(request, f'สร้างการแข่งขัน "{tournament.name}" เรียบร้อยแล้ว')
+        return redirect('home')
+    
+    return render(request, 'tournaments/create_tournament.html', {'games': games})
+
+
+@login_required
 def manage_standings_view(request, pk):
     """Admin view to manually override standings."""
     tournament = get_object_or_404(Tournament, pk=pk)
     
     # Check permission
-    if request.user != tournament.created_by and not request.user.is_superuser:
+    is_authorized = request.user == tournament.created_by or request.user.is_superuser
+    if hasattr(request.user, 'profile') and request.user.profile.role == 'tournament_admin':
+        is_authorized = True
+
+    if not is_authorized:
         messages.error(request, "คุณไม่มีสิทธิ์จัดการตารางคะแนนนี้")
         return redirect('tournament_standings', pk=pk)
 
@@ -415,3 +515,87 @@ def manage_standings_view(request, pk):
     return render(request, 'tournaments/manage_standings.html', {'tournament': tournament, 'registrations': registrations})
 
 
+
+@login_required
+def swap_teams_view(request, pk):
+    """
+    Swap two teams in the bracket.
+    This works by swapping the Team objects assigned to match slots (team1 or team2).
+    """
+    tournament = get_object_or_404(Tournament, pk=pk)
+    
+    # Check permission
+    if request.user != tournament.created_by and not request.user.is_superuser:
+        messages.error(request, "คุณไม่มีสิทธิ์จัดการการแข่งขันนี้")
+        return redirect('tournament_bracket', pk=pk)
+
+    if request.method == 'POST':
+        team1_id = request.POST.get('team1_id')
+        team2_id = request.POST.get('team2_id')
+
+        if not team1_id or not team2_id:
+            messages.error(request, "กรุณาเลือกทีมที่ต้องการสลับทั้ง 2 ทีม")
+            return redirect('tournament_bracket', pk=pk)
+            
+        if team1_id == team2_id:
+             messages.error(request, "ไม่สามารถสลับทีมเดียวกันได้")
+             return redirect('tournament_bracket', pk=pk)
+
+        # Strategy:
+        # We need to find *where* these teams are in the bracket (specifically round 1 or current matches?).
+        # Ideally, swapping implies swapping their seed positions.
+        # But if the tournament is ongoing, swapping might break things if they are in different rounds.
+        # Strict mode: Only allow swapping if the tournament is NOT finished? 
+        # Or just swap occurrences in *scheduled* matches?
+        
+        # Let's implementation: Swap all occurrences in Matches where status is 'scheduled'.
+        # Actually safer: Swap occurrences in Round 1?
+        # If bracket is generated, teams are assigned to R1 matches.
+        # Let's find R1 matches involving these teams.
+        
+        from django.db.models import Q
+        
+        # Find matches for team 1
+        matches_t1 = Match.objects.filter(
+            tournament=tournament,
+            status__in=['scheduled', 'ongoing']
+        ).filter(Q(team1_id=team1_id) | Q(team2_id=team2_id)) # Get matches for BOTH teams
+        
+        # This is tricky because a team might be in multiple matches if they won?
+        # But we usually swap BEFORE tournament starts or early on.
+        # Simplest Logic: Swap the Team IDs in R1 matches only? 
+        # If we swap seeds, we should swap R1 assignments.
+        
+        r1_matches = Match.objects.filter(tournament=tournament, round_no=1)
+        
+        swapped_count = 0
+        
+        # We need to fetch objects to modify
+        for m in r1_matches:
+            changed = False
+            # Check Team 1 slot
+            if m.team1_id == int(team1_id):
+                m.team1_id = int(team2_id)
+                changed = True
+            elif m.team1_id == int(team2_id):
+                m.team1_id = int(team1_id)
+                changed = True
+                
+            # Check Team 2 slot
+            if m.team2_id == int(team1_id):
+                m.team2_id = int(team2_id)
+                changed = True
+            elif m.team2_id == int(team2_id):
+                m.team2_id = int(team1_id)
+                changed = True
+            
+            if changed:
+                m.save()
+                swapped_count += 1
+                
+        if swapped_count > 0:
+            messages.success(request, f"สลับตำแหน่งทีมเรียบร้อยแล้ว ({swapped_count} แมตช์)")
+        else:
+            messages.warning(request, "ไม่พบแมตช์รอบแรกที่สามารถสลับทีมได้")
+            
+    return redirect('tournament_bracket', pk=pk)

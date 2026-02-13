@@ -8,13 +8,12 @@
   /* Premium Dark Theme Variables */
   :root {
     --bg-dark: #0f1223;
-    --card-bg: rgba(30, 35, 55, 0.6);
-    --border-color: rgba(255, 255, 255, 0.08);
+    --card-bg: rgba(45, 50, 80, 0.85);
+    --border-color: rgba(255, 255, 255, 0.15);
     --accent-gold: #ffd700;
     --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-    --card-hover-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
     --winner-color: #4ade80;
-    --loser-color: #f87171;
+    --connector-color: rgba(255, 255, 255, 0.3);
   }
 
   /* Bracket Layout */
@@ -23,183 +22,127 @@
     background: var(--bg-dark);
     position: relative;
     overflow-x: auto;
-    overflow-y: hidden;
+    overflow-y: auto;
     padding: 3rem 1rem;
     color: #fff;
-  }
-
-  /* Background Glow */
-  .glow-bg {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 80vw;
-    height: 80vw;
-    background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 60%);
-    pointer-events: none;
-    z-index: 0;
   }
 
   .bracket-header {
     position: relative;
     z-index: 10;
-    margin-bottom: 3rem;
-    padding: 0 1rem;
+    margin-bottom: 2rem;
+    padding: 0 2rem;
     max-width: 1400px;
     margin-left: auto;
     margin-right: auto;
   }
 
   .tournament-title {
-    font-size: 2.5rem;
-    font-weight: 800;
-    background: linear-gradient(90deg, #fff, #a5b4fc);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #fff;
     margin-bottom: 0.5rem;
   }
 
-  /* Bracket Grid */
+  /* Bracket Container - Horizontal scroll */
   .bracket-container {
     display: flex;
-    gap: 4rem;
-    padding: 2rem 4rem;
-    /* Extra padding for scroll */
+    gap: 0;
+    padding: 2rem;
     position: relative;
     z-index: 5;
     min-width: min-content;
-    /* Ensure container expands */
   }
 
+  /* Round Column */
   .round-column {
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
-    min-width: 280px;
+    min-width: 240px;
     position: relative;
   }
 
   .round-title {
     text-align: center;
     color: #94a3b8;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    font-weight: 700;
+    font-size: 0.9rem;
+    text-transform: capitalize;
+    font-weight: 600;
     margin-bottom: 2rem;
-    padding: 8px 16px;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 20px;
-    align-self: center;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 8px;
+    border-bottom: 2px solid #6366f1;
   }
 
-  /* Match Card */
+  .matches-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    flex: 1;
+    gap: 1.5rem;
+  }
+
+  /* Match Card with Connector */
+  .match-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
   .match-card {
     background: var(--card-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--border-color);
-    border-radius: 12px;
-    margin: 1rem 0;
+    border-radius: 6px;
+    width: 220px;
     position: relative;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
     overflow: hidden;
   }
 
   .match-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--card-hover-shadow);
-    border-color: rgba(99, 102, 241, 0.4);
+    border-color: #6366f1;
+    transform: scale(1.02);
   }
 
-  .match-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
-    background: var(--accent-gradient);
-    opacity: 0;
-    transition: opacity 0.3s;
+  .match-card.selected {
+    border-color: #6366f1;
+    border-width: 2px;
   }
 
-  .match-card:hover::before {
-    opacity: 1;
-  }
-
-  .match-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 12px;
-    background: rgba(0, 0, 0, 0.2);
-    font-size: 0.75rem;
-    color: #64748b;
-  }
-
-  .match-status {
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-weight: 600;
-  }
-
-  .status-finished {
-    color: var(--winner-color);
-    background: rgba(74, 222, 128, 0.1);
-  }
-
-  .status-scheduled {
-    color: #94a3b8;
-    background: rgba(148, 163, 184, 0.1);
-  }
-
-  .status-live {
-    color: #facc15;
-    background: rgba(250, 204, 21, 0.1);
-    animate: pulse 2s infinite;
-  }
-
+  /* Team Row */
   .team-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 16px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    transition: background 0.2s;
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(0, 0, 0, 0.1);
   }
 
   .team-row:last-child {
     border-bottom: none;
   }
 
-  .team-row:hover {
-    background: rgba(255, 255, 255, 0.02);
-  }
-
   .team-name {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    font-size: 0.9rem;
     font-weight: 500;
     color: #e2e8f0;
-    font-size: 0.95rem;
+    max-width: 160px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .team-score {
     font-weight: 700;
-    font-size: 1.1rem;
+    font-size: 1rem;
     color: #fff;
-    width: 30px;
+    min-width: 24px;
     text-align: center;
   }
 
   .winner .team-name {
     color: var(--winner-color);
-    text-shadow: 0 0 10px rgba(74, 222, 128, 0.3);
+    font-weight: 600;
   }
 
   .winner .team-score {
@@ -207,37 +150,61 @@
   }
 
   .loser .team-name {
-    color: #94a3b8;
-    opacity: 0.7;
-  }
-
-  .loser .team-score {
     color: #64748b;
   }
 
-  .tbd {
+  .loser .team-score {
     color: #475569;
-    font-style: italic;
   }
 
-  /* Utility Buttons */
+  .tbd {
+    color: #64748b;
+    font-style: italic;
+    font-size: 0.85rem;
+  }
+
+  /* Connector Lines */
+  .connector-right {
+    position: absolute;
+    right: -40px;
+    width: 40px;
+    height: 2px;
+    background: var(--connector-color);
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .connector-vertical {
+    position: absolute;
+    right: -40px;
+    width: 2px;
+    background: var(--connector-color);
+  }
+
+  /* Spacer for alignment */
+  .round-spacer {
+    width: 40px;
+    flex-shrink: 0;
+  }
+
+  /* Actions */
   .action-btn {
     background: var(--accent-gradient);
     border: none;
     color: white;
-    padding: 10px 24px;
-    border-radius: 30px;
+    padding: 8px 20px;
+    border-radius: 20px;
     font-weight: 600;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    transition: transform 0.2s, box-shadow 0.2s;
+    gap: 6px;
+    transition: transform 0.2s;
     text-decoration: none;
+    font-size: 0.9rem;
   }
 
   .action-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
     color: #fff;
   }
 
@@ -245,13 +212,14 @@
     background: transparent;
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: #e2e8f0;
-    padding: 10px 24px;
-    border-radius: 30px;
+    padding: 8px 20px;
+    border-radius: 20px;
     transition: all 0.2s;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
+    font-size: 0.9rem;
   }
 
   .outline-btn:hover {
@@ -260,54 +228,50 @@
     color: #fff;
   }
 
-  /* Scrollbar override */
-  ::-webkit-scrollbar {
-    height: 8px;
-    width: 8px;
+  /* Empty State */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 50vh;
+    opacity: 0.6;
   }
 
-  ::-webkit-scrollbar-track {
-    background: var(--bg-dark);
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: #334155;
-    border-radius: 4px;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: #475569;
-  }
-
+  /* Responsive */
   @media (max-width: 768px) {
     .match-card {
-      min-width: 240px;
-      margin: 10px 0;
+      width: 200px;
+    }
+
+    .round-column {
+      min-width: 220px;
     }
   }
 </style>
 
 <div class="bracket-section">
-  <div class="glow-bg"></div>
-
-  <!-- Content -->
+  <!-- Header -->
   <div class="bracket-header">
-    <div class="d-flex justify-content-between align-items-end flex-wrap gap-4">
+    <div class="d-flex justify-content-between align-items-end flex-wrap gap-3">
       <div>
         <h1 class="tournament-title">{{ tournament.name }}</h1>
-        <p class="text-gray-400 mb-0"><i class="fas fa-sitemap me-2"></i>สายการแข่งขัน (Bracket)</p>
+        <p class="text-muted mb-0"><i class="fas fa-sitemap me-2"></i>สายการแข่งขัน (Bracket)</p>
       </div>
 
-      <div class="d-flex gap-3">
+      <div class="d-flex gap-2">
         {% if user == tournament.created_by or user.is_superuser %}
         {% if tournament.status == 'draft' or tournament.status == 'open' or tournament.status == 'closed' %}
         <a href="{% url 'tournament_start' tournament.pk %}" class="action-btn"
           onclick="return confirm('การสุ่มสายใหม่จะลบข้อมูลการแข่งขันเดิมทั้งหมด ยืนยันหรือไม่?');">
-          <i class="fas fa-random"></i> Generate Bracket
+          <i class="fas fa-random"></i> Generate
         </a>
         {% endif %}
+        <button type="button" class="outline-btn" data-bs-toggle="modal" data-bs-target="#swapTeamsModal">
+          <i class="fas fa-exchange-alt"></i> Swap Teams
+        </button>
         <a href="{% url 'manage_matches' tournament.pk %}" class="outline-btn">
-          <i class="fas fa-edit"></i> Update Scores
+          <i class="fas fa-edit"></i> Scores
         </a>
         {% endif %}
 
@@ -326,60 +290,115 @@
     {% for round_no, match_list in rounds %}
     <div class="round-column">
       <div class="round-title">
-        {% if forloop.last %}Grand Final{% else %}Round {{ round_no }}{% endif %}
+        {% if forloop.last %}Round {{ round_no }} (Final){% else %}Round {{ round_no }}{% endif %}
       </div>
 
-      {% for m in match_list %}
-      <div class="match-card">
-        <div class="match-header">
-          <span>Match #{{ m.match_no }}</span>
-          <!-- Fix: Use lower case m and check status correctly -->
-          <span
-            class="match-status {% if m.status == 'finished' %}status-finished{% elif m.status == 'ongoing' %}status-live{% else %}status-scheduled{% endif %}">
-            {{ m.get_status_display }}
-          </span>
-        </div>
+      <div class="matches-wrapper">
+        {% for m in match_list %}
+        <div class="match-wrapper">
+          <div class="match-card {% if m.status == 'ongoing' %}selected{% endif %}">
+            <div
+              class="team-row {% if m.result and m.result.winner_team == m.team1 %}winner{% elif m.result and m.team1 %}loser{% endif %}">
+              <span class="team-name">
+                {% if m.team1 %}{{ m.team1.name|truncatechars:20 }}{% else %}<span class="tbd">TBD</span>{% endif %}
+              </span>
+              <span class="team-score">
+                {% if m.result %}{{ m.result.team1_score }}{% else %}-{% endif %}
+              </span>
+            </div>
 
-        <div
-          class="team-row {% if m.result and m.result.winner_team == m.team1 %}winner{% elif m.result and m.result.winner_team != m.team1 %}loser{% endif %}">
-          <span class="team-name">
-            {% if m.team1 %}
-            {{ m.team1.name|truncatechars:18 }}
-            {% else %}
-            <span class="tbd">TBD</span>
-            {% endif %}
-          </span>
-          <span class="team-score">
-            {% if m.result %}{{ m.result.team1_score }}{% else %}-{% endif %}
-          </span>
-        </div>
+            <div
+              class="team-row {% if m.result and m.result.winner_team == m.team2 %}winner{% elif m.result and m.team2 %}loser{% endif %}">
+              <span class="team-name">
+                {% if m.team2 %}{{ m.team2.name|truncatechars:20 }}{% else %}<span class="tbd">TBD</span>{% endif %}
+              </span>
+              <span class="team-score">
+                {% if m.result %}{{ m.result.team2_score }}{% else %}-{% endif %}
+              </span>
+            </div>
+          </div>
 
-        <div
-          class="team-row {% if m.result and m.result.winner_team == m.team2 %}winner{% elif m.result and m.result.winner_team != m.team2 %}loser{% endif %}">
-          <span class="team-name">
-            {% if m.team2 %}
-            {{ m.team2.name|truncatechars:18 }}
-            {% else %}
-            <span class="tbd">TBD</span>
-            {% endif %}
-          </span>
-          <span class="team-score">
-            {% if m.result %}{{ m.result.team2_score }}{% else %}-{% endif %}
-          </span>
+          <!-- Connector line to next round -->
+          {% if not forloop.parentloop.last %}
+          <div class="connector-right"></div>
+          {% endif %}
         </div>
+        {% endfor %}
       </div>
-      {% endfor %}
     </div>
+
+    <!-- Spacer between rounds -->
+    {% if not forloop.last %}
+    <div class="round-spacer"></div>
+    {% endif %}
     {% endfor %}
   </div>
   {% else %}
   <!-- Empty State -->
-  <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 50vh; opacity: 0.6;">
+  <div class="empty-state">
     <i class="fas fa-project-diagram fa-3x mb-4 text-secondary"></i>
-    <h3 class="text-white">Waiting for Bracket Generation</h3>
-    <p class="text-muted">The tournament bracket hasn't been generated yet.</p>
+    <h3>ยังไม่มีสายการแข่งขัน</h3>
+    <p class="text-muted">กรุณากด Generate เพื่อสร้างสายการแข่งขัน</p>
   </div>
   {% endif %}
 
 </div>
+
+<!-- Context Menu / Modal for Swap -->
+{% if user == tournament.created_by or user.is_superuser %}
+<div class="modal fade" id="swapTeamsModal" tabindex="-1" aria-labelledby="swapTeamsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="background: #1a1a2e; border: 1px solid rgba(255,255,255,0.1); color: #fff;">
+      <div class="modal-header" style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+        <h5 class="modal-title" id="swapTeamsModalLabel">สลับตำแหน่งทีม (Swap Teams)</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="{% url 'swap_teams' tournament.pk %}" method="post">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="alert alert-warning" style="font-size: 0.9rem;">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            การสลับทีมจะเปลี่ยนตำแหน่งในตารางแข่งขันรอบแรก (Round 1) ทันที
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label text-muted">เลือกทีมที่ 1</label>
+            <select name="team1_id" class="form-select bg-dark text-white border-secondary" required>
+              <option value="">-- เลือกทีม --</option>
+              {% for team in teams %}
+              <option value="{{ team.id }}">{{ team.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="d-flex justify-content-center my-3">
+            <i class="fas fa-exchange-alt fa-2x text-muted"></i>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label text-muted">เลือกทีมที่ 2</label>
+            <select name="team2_id" class="form-select bg-dark text-white border-secondary" required>
+              <option value="">-- เลือกทีม --</option>
+              {% for team in teams %}
+              <option value="{{ team.id }}">{{ team.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer" style="border-top: 1px solid rgba(255,255,255,0.1);">
+          <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">ยกเลิก</button>
+          <button type="submit" class="btn btn-primary">ยืนยันการสลับ</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<script>
+  // Auto-refresh every 15 seconds for real-time updates
+  setInterval(function () {
+    location.reload();
+  }, 15000);
+</script>
 {% endblock %}

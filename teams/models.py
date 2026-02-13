@@ -9,7 +9,9 @@ class Team(models.Model):
     # รายละเอียดทีม (จะเว้นว่างก็ได้)
     description = models.TextField(blank=True)
 
-    # ลิงก์โลโก้ทีม (อาจเก็บ URL จาก storage หรือ external)
+    # โลโก้ทีม (อัปโหลดไฟล์)
+    logo = models.ImageField(upload_to='teams/logos/', blank=True, null=True)
+    # ลิงก์โลโก้ทีม (อาจเก็บ URL จาก storage หรือ external) - kept for backward compatibility
     logo_url = models.URLField(blank=True)
     # Optional join code allowing players to join via a passcode
     join_code = models.CharField(max_length=32, blank=True, null=True)

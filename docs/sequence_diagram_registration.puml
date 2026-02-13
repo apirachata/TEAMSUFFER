@@ -1,0 +1,53 @@
+@startuml
+autonumber
+actor "User (Team Leader)" as User
+boundary "Registration View" as View
+control "Tournament Controller" as Controller
+entity "Team" as TeamModel
+entity "TeamMember" as MemberModel
+entity "TournamentRegistration" as RegModel
+database "Database" as DB
+
+User -> View: Request Registration Page (GET /tournaments/{id}/register/create-team/)
+activate View
+View -> Controller: Validate User Status
+activate Controller
+Controller -> DB: Check existing team membership
+DB --> Controller: Result
+Controller -> DB: Check existing tournament registration
+DB --> Controller: Result
+Controller --> View: Validation Result
+deactivate Controller
+
+alt Validation Fails
+    View --> User: Show Error Message (Already in team / Already registered)
+else Validation Success
+    View --> User: Show Create Team Form
+end
+deactivate View
+
+User -> View: Submit Team Details (POST)
+activate View
+View -> Controller: Process Registration
+activate Controller
+Controller -> TeamModel: Create Team(name, created_by)
+activate TeamModel
+TeamModel -> DB: Save
+deactivate TeamModel
+
+Controller -> MemberModel: Create Member(user, role='leader', status='accepted')
+activate MemberModel
+MemberModel -> DB: Save
+deactivate MemberModel
+
+Controller -> RegModel: Create Registration(tournament, team, status='approved')
+activate RegModel
+RegModel -> DB: Save
+deactivate RegModel
+
+Controller --> View: Success
+deactivate Controller
+View --> User: Redirect to Home (Success Message)
+deactivate View
+
+@enduml

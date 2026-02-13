@@ -1,0 +1,316 @@
+﻿docker : time="2026-01-06T17:21:07+07:00" level=warning 
+msg="D:\\TEAMSUFFER\\docker-compose.prod.yml: the attribute `version` is obsolete, it will be 
+ignored, please remove it to avoid potential confusion"
+At line:1 char:1
++ docker compose -f docker-compose.prod.yml build 2>&1 | Out-File -File ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (time="2026-01-0...tial confusion":String) [], RemoteExc 
+   eption
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+#1 [internal] load local bake definitions
+#1 reading from stdin 476B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 800B done
+#2 DONE 0.0s
+
+#3 [auth] library/python:pull token for registry-1.docker.io
+#3 DONE 0.0s
+
+#4 [internal] load metadata for docker.io/library/python:3.11-slim
+#4 DONE 2.3s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 2B done
+#5 DONE 0.0s
+
+#6 [1/8] FROM docker.io/library/python:3.11-slim@sha256:1dd3dca85e22886e44fcad1bb7ccab6691dfa83db52214cf9e20696e095f3e36
+#6 resolve docker.io/library/python:3.11-slim@sha256:1dd3dca85e22886e44fcad1bb7ccab6691dfa83db52214cf9e20696e095f3e36 0.0s done
+#6 DONE 0.0s
+
+#7 [internal] load build context
+#7 transferring context: 1.27MB 0.7s done
+#7 DONE 0.8s
+
+#8 [2/8] WORKDIR /app
+#8 CACHED
+
+#9 [3/8] RUN apt-get update && apt-get install -y --no-install-recommends     gcc     libpq-dev     default-libmysqlclient-dev     pkg-config     && rm -rf /var/lib/apt/lists/*
+#9 CACHED
+
+#10 [4/8] COPY requirements.txt /app/
+#10 DONE 0.0s
+
+#11 [5/8] RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
+#11 1.359 Requirement already satisfied: pip in /usr/local/lib/python3.11/site-packages (24.0)
+#11 1.511 Collecting pip
+#11 1.703   Downloading pip-25.3-py3-none-any.whl.metadata (4.7 kB)
+#11 1.756 Downloading pip-25.3-py3-none-any.whl (1.8 MB)
+#11 1.988    ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü 1.8/1.8 MB 7.9 MB/s eta 0:00:00
+#11 2.026 Installing collected packages: pip
+#11 2.027   Attempting uninstall: pip
+#11 2.029     Found existing installation: pip 24.0
+#11 2.065     Uninstalling pip-24.0:
+#11 2.290       Successfully uninstalled pip-24.0
+#11 3.033 Successfully installed pip-25.3
+#11 3.034 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+#11 3.953 Collecting asgiref==3.9.1 (from -r requirements.txt (line 1))
+#11 4.133   Downloading asgiref-3.9.1-py3-none-any.whl.metadata (9.3 kB)
+#11 4.157 Collecting attrs==25.4.0 (from -r requirements.txt (line 2))
+#11 4.200   Downloading attrs-25.4.0-py3-none-any.whl.metadata (10 kB)
+#11 4.225 Collecting Automat==25.4.16 (from -r requirements.txt (line 3))
+#11 4.269   Downloading automat-25.4.16-py3-none-any.whl.metadata (8.4 kB)
+#11 4.301 Collecting certifi==2025.11.12 (from -r requirements.txt (line 4))
+#11 4.344   Downloading certifi-2025.11.12-py3-none-any.whl.metadata (2.5 kB)
+#11 4.471 Collecting cffi==2.0.0 (from -r requirements.txt (line 5))
+#11 4.513   Downloading cffi-2.0.0-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (2.6 kB)
+#11 4.591 Collecting charset-normalizer==3.4.4 (from -r requirements.txt (line 6))
+#11 4.633   Downloading charset_normalizer-3.4.4-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (37 kB)
+#11 4.673 Collecting constantly==23.10.4 (from -r requirements.txt (line 7))
+#11 4.716   Downloading constantly-23.10.4-py3-none-any.whl.metadata (1.8 kB)
+#11 4.737 Collecting Crawl==0.5.5 (from -r requirements.txt (line 8))
+#11 4.781   Downloading Crawl-0.5.5.tar.gz (6.6 kB)
+#11 4.788   Installing build dependencies: started
+#11 6.150   Installing build dependencies: finished with status 'done'
+#11 6.152   Getting requirements to build wheel: started
+#11 6.605   Getting requirements to build wheel: finished with status 'done'
+#11 6.607   Preparing metadata (pyproject.toml): started
+#11 7.067   Preparing metadata (pyproject.toml): finished with status 'done'
+#11 7.215 Collecting cryptography==46.0.3 (from -r requirements.txt (line 9))
+#11 7.257   Downloading cryptography-46.0.3-cp311-abi3-manylinux_2_34_x86_64.whl.metadata (5.7 kB)
+#11 7.283 Collecting cssselect==1.3.0 (from -r requirements.txt (line 10))
+#11 7.326   Downloading cssselect-1.3.0-py3-none-any.whl.metadata (2.6 kB)
+#11 7.347 Collecting defusedxml==0.7.1 (from -r requirements.txt (line 11))
+#11 7.391   Downloading defusedxml-0.7.1-py2.py3-none-any.whl.metadata (32 kB)
+#11 7.457 Collecting Django==5.2.4 (from -r requirements.txt (line 12))
+#11 7.502   Downloading django-5.2.4-py3-none-any.whl.metadata (4.1 kB)
+#11 7.533 Collecting django-allauth==65.13.1 (from -r requirements.txt (line 13))
+#11 7.578   Downloading django_allauth-65.13.1-py3-none-any.whl.metadata (9.2 kB)
+#11 7.611 Collecting django-tailwind==4.2.0 (from -r requirements.txt (line 14))
+#11 7.654   Downloading django_tailwind-4.2.0-py3-none-any.whl.metadata (4.4 kB)
+#11 7.713 Collecting djangorestframework==3.16.1 (from -r requirements.txt (line 15))
+#11 7.757   Downloading djangorestframework-3.16.1-py3-none-any.whl.metadata (11 kB)
+#11 7.784 Collecting djangorestframework_simplejwt==5.5.1 (from -r requirements.txt (line 16))
+#11 7.827   Downloading djangorestframework_simplejwt-5.5.1-py3-none-any.whl.metadata (4.6 kB)
+#11 7.852 Collecting dj-database-url==2.3.0 (from -r requirements.txt (line 17))
+#11 7.895   Downloading dj_database_url-2.3.0-py3-none-any.whl.metadata (12 kB)
+#11 7.924 Collecting filelock==3.20.0 (from -r requirements.txt (line 18))
+#11 7.967   Downloading filelock-3.20.0-py3-none-any.whl.metadata (2.1 kB)
+#11 7.993 Collecting gunicorn==23.0.0 (from -r requirements.txt (line 19))
+#11 8.035   Downloading gunicorn-23.0.0-py3-none-any.whl.metadata (4.4 kB)
+#11 8.057 Collecting h11==0.16.0 (from -r requirements.txt (line 20))
+#11 8.100   Downloading h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+#11 8.122 Collecting hyperlink==21.0.0 (from -r requirements.txt (line 21))
+#11 8.165   Downloading hyperlink-21.0.0-py2.py3-none-any.whl.metadata (1.5 kB)
+#11 8.187 Collecting idna==3.11 (from -r requirements.txt (line 22))
+#11 8.230   Downloading idna-3.11-py3-none-any.whl.metadata (8.4 kB)
+#11 8.253 Collecting incremental==24.7.2 (from -r requirements.txt (line 23))
+#11 8.297   Downloading incremental-24.7.2-py3-none-any.whl.metadata (8.1 kB)
+#11 8.320 Collecting itemadapter==0.12.2 (from -r requirements.txt (line 24))
+#11 8.364   Downloading itemadapter-0.12.2-py3-none-any.whl.metadata (22 kB)
+#11 8.391 Collecting itemloaders==1.3.2 (from -r requirements.txt (line 25))
+#11 8.434   Downloading itemloaders-1.3.2-py3-none-any.whl.metadata (3.9 kB)
+#11 8.458 Collecting jmespath==1.0.1 (from -r requirements.txt (line 26))
+#11 8.500   Downloading jmespath-1.0.1-py3-none-any.whl.metadata (7.6 kB)
+#11 8.656 Collecting lxml==6.0.2 (from -r requirements.txt (line 27))
+#11 8.699   Downloading lxml-6.0.2-cp311-cp311-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl.metadata (3.6 kB)
+#11 8.729 Collecting mysqlclient==2.2.7 (from -r requirements.txt (line 28))
+#11 8.772   Downloading mysqlclient-2.2.7.tar.gz (91 kB)
+#11 8.836   Installing build dependencies: started
+#11 9.754   Installing build dependencies: finished with status 'done'
+#11 9.755   Getting requirements to build wheel: started
+#11 10.36   Getting requirements to build wheel: finished with status 'done'
+#11 10.37   Preparing metadata (pyproject.toml): started
+#11 11.02   Preparing metadata (pyproject.toml): finished with status 'done'
+#11 11.04 Collecting outcome==1.3.0.post0 (from -r requirements.txt (line 29))
+#11 11.08   Downloading outcome-1.3.0.post0-py2.py3-none-any.whl.metadata (2.6 kB)
+#11 11.11 Collecting packaging==25.0 (from -r requirements.txt (line 30))
+#11 11.15   Downloading packaging-25.0-py3-none-any.whl.metadata (3.3 kB)
+#11 11.18 Collecting parsel==1.10.0 (from -r requirements.txt (line 31))
+#11 11.22   Downloading parsel-1.10.0-py2.py3-none-any.whl.metadata (11 kB)
+#11 11.37 Collecting pillow==11.3.0 (from -r requirements.txt (line 32))
+#11 11.41   Downloading pillow-11.3.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (9.0 kB)
+#11 11.47 Collecting Protego==0.5.0 (from -r requirements.txt (line 33))
+#11 11.51   Downloading protego-0.5.0-py3-none-any.whl.metadata (6.4 kB)
+#11 11.57 Collecting psycopg2-binary==2.9.11 (from -r requirements.txt (line 34))
+#11 11.61   Downloading psycopg2_binary-2.9.11-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (4.9 kB)
+#11 11.64 Collecting pyasn1==0.6.1 (from -r requirements.txt (line 35))
+#11 11.68   Downloading pyasn1-0.6.1-py3-none-any.whl.metadata (8.4 kB)
+#11 11.71 Collecting pyasn1_modules==0.4.2 (from -r requirements.txt (line 36))
+#11 11.75   Downloading pyasn1_modules-0.4.2-py3-none-any.whl.metadata (3.5 kB)
+#11 11.77 Collecting pycparser==2.23 (from -r requirements.txt (line 37))
+#11 11.82   Downloading pycparser-2.23-py3-none-any.whl.metadata (993 bytes)
+#11 11.84 Collecting PyDispatcher==2.0.7 (from -r requirements.txt (line 38))
+#11 11.88   Downloading PyDispatcher-2.0.7-py3-none-any.whl.metadata (2.4 kB)
+#11 11.90 Collecting PyJWT==2.10.1 (from -r requirements.txt (line 39))
+#11 11.95   Downloading PyJWT-2.10.1-py3-none-any.whl.metadata (4.0 kB)
+#11 11.97 Collecting pyOpenSSL==25.3.0 (from -r requirements.txt (line 40))
+#11 12.01   Downloading pyopenssl-25.3.0-py3-none-any.whl.metadata (17 kB)
+#11 12.04 Collecting PySocks==1.7.1 (from -r requirements.txt (line 41))
+#11 12.08   Downloading PySocks-1.7.1-py3-none-any.whl.metadata (13 kB)
+#11 12.10 Collecting queuelib==1.8.0 (from -r requirements.txt (line 42))
+#11 12.15   Downloading queuelib-1.8.0-py3-none-any.whl.metadata (6.1 kB)
+#11 12.18 Collecting requests==2.32.5 (from -r requirements.txt (line 43))
+#11 12.22   Downloading requests-2.32.5-py3-none-any.whl.metadata (4.9 kB)
+#11 12.24 Collecting requests-file==3.0.1 (from -r requirements.txt (line 44))
+#11 12.29   Downloading requests_file-3.0.1-py2.py3-none-any.whl.metadata (1.7 kB)
+#11 12.31 Collecting Scrapy==2.13.4 (from -r requirements.txt (line 45))
+#11 12.36   Downloading scrapy-2.13.4-py3-none-any.whl.metadata (4.4 kB)
+#11 12.39 Collecting selenium==4.38.0 (from -r requirements.txt (line 46))
+#11 12.44   Downloading selenium-4.38.0-py3-none-any.whl.metadata (7.5 kB)
+#11 12.46 Collecting service-identity==24.2.0 (from -r requirements.txt (line 47))
+#11 12.54   Downloading service_identity-24.2.0-py3-none-any.whl.metadata (5.1 kB)
+#11 12.63 Collecting setuptools==80.9.0 (from -r requirements.txt (line 48))
+#11 12.67   Downloading setuptools-80.9.0-py3-none-any.whl.metadata (6.6 kB)
+#11 12.70 Collecting sniffio==1.3.1 (from -r requirements.txt (line 49))
+#11 12.74   Downloading sniffio-1.3.1-py3-none-any.whl.metadata (3.9 kB)
+#11 12.77 Collecting sortedcontainers==2.4.0 (from -r requirements.txt (line 50))
+#11 12.81   Downloading sortedcontainers-2.4.0-py2.py3-none-any.whl.metadata (10 kB)
+#11 12.83 Collecting sqlparse==0.5.3 (from -r requirements.txt (line 51))
+#11 12.87   Downloading sqlparse-0.5.3-py3-none-any.whl.metadata (3.9 kB)
+#11 12.90 Collecting tldextract==5.3.0 (from -r requirements.txt (line 52))
+#11 12.94   Downloading tldextract-5.3.0-py3-none-any.whl.metadata (11 kB)
+#11 12.97 Collecting trio==0.32.0 (from -r requirements.txt (line 53))
+#11 13.01   Downloading trio-0.32.0-py3-none-any.whl.metadata (8.5 kB)
+#11 13.03 Collecting trio-websocket==0.12.2 (from -r requirements.txt (line 54))
+#11 13.08   Downloading trio_websocket-0.12.2-py3-none-any.whl.metadata (5.1 kB)
+#11 13.11 Collecting Twisted==25.5.0 (from -r requirements.txt (line 55))
+#11 13.15   Downloading twisted-25.5.0-py3-none-any.whl.metadata (22 kB)
+#11 13.22 Collecting typing_extensions==4.15.0 (from -r requirements.txt (line 56))
+#11 13.26   Downloading typing_extensions-4.15.0-py3-none-any.whl.metadata (3.3 kB)
+#11 13.29 Collecting tzdata==2025.2 (from -r requirements.txt (line 57))
+#11 13.33   Downloading tzdata-2025.2-py2.py3-none-any.whl.metadata (1.4 kB)
+#11 13.36 Collecting urllib3==2.5.0 (from -r requirements.txt (line 58))
+#11 13.40   Downloading urllib3-2.5.0-py3-none-any.whl.metadata (6.5 kB)
+#11 13.66 Collecting uv==0.9.11 (from -r requirements.txt (line 59))
+#11 13.71   Downloading uv-0.9.11-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (11 kB)
+#11 13.73 Collecting w3lib==2.3.1 (from -r requirements.txt (line 60))
+#11 13.77   Downloading w3lib-2.3.1-py3-none-any.whl.metadata (2.3 kB)
+#11 13.80 Collecting websocket-client==1.9.0 (from -r requirements.txt (line 61))
+#11 13.84   Downloading websocket_client-1.9.0-py3-none-any.whl.metadata (8.3 kB)
+#11 13.87 Collecting whitenoise==6.9.0 (from -r requirements.txt (line 62))
+#11 13.92   Downloading whitenoise-6.9.0-py3-none-any.whl.metadata (3.6 kB)
+#11 13.94 Collecting wsproto==1.3.2 (from -r requirements.txt (line 63))
+#11 13.98   Downloading wsproto-1.3.2-py3-none-any.whl.metadata (5.2 kB)
+#11 14.08 Collecting zope.interface==8.1.1 (from -r requirements.txt (line 64))
+#11 14.12   Downloading zope_interface-8.1.1-cp311-cp311-manylinux1_x86_64.manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_5_x86_64.whl.metadata (45 kB)
+#11 14.42 Downloading asgiref-3.9.1-py3-none-any.whl (23 kB)
+#11 14.46 Downloading attrs-25.4.0-py3-none-any.whl (67 kB)
+#11 14.51 Downloading automat-25.4.16-py3-none-any.whl (42 kB)
+#11 14.55 Downloading certifi-2025.11.12-py3-none-any.whl (159 kB)
+#11 14.64 Downloading cffi-2.0.0-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (215 kB)
+#11 14.69 Downloading charset_normalizer-3.4.4-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (151 kB)
+#11 14.75 Downloading constantly-23.10.4-py3-none-any.whl (13 kB)
+#11 14.79 Downloading cryptography-46.0.3-cp311-abi3-manylinux_2_34_x86_64.whl (4.5 MB)
+#11 15.04    ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü 4.5/4.5 MB 17.8 MB/s  0:00:00
+#11 15.08 Downloading cssselect-1.3.0-py3-none-any.whl (18 kB)
+#11 15.13 Downloading defusedxml-0.7.1-py2.py3-none-any.whl (25 kB)
+#11 15.17 Downloading django-5.2.4-py3-none-any.whl (8.3 MB)
+#11 15.65    ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü 8.3/8.3 MB 17.1 MB/s  0:00:00
+#11 15.70 Downloading django_allauth-65.13.1-py3-none-any.whl (1.8 MB)
+#11 15.77    ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü 1.8/1.8 MB 28.5 MB/s  0:00:00
+#11 15.81 Downloading django_tailwind-4.2.0-py3-none-any.whl (19 kB)
+#11 15.85 Downloading djangorestframework-3.16.1-py3-none-any.whl (1.1 MB)
+#11 15.91    ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü 1.1/1.1 MB 17.1 MB/s  0:00:00
+#11 15.96 Downloading djangorestframework_simplejwt-5.5.1-py3-none-any.whl (107 kB)
+#11 16.00 Downloading dj_database_url-2.3.0-py3-none-any.whl (7.8 kB)
+#11 16.04 Downloading filelock-3.20.0-py3-none-any.whl (16 kB)
+#11 16.09 Downloading gunicorn-23.0.0-py3-none-any.whl (85 kB)
+#11 16.13 Downloading h11-0.16.0-py3-none-any.whl (37 kB)
+#11 16.17 Downloading hyperlink-21.0.0-py2.py3-none-any.whl (74 kB)
+#11 16.22 Downloading idna-3.11-py3-none-any.whl (71 kB)
+#11 16.26 Downloading incremental-24.7.2-py3-none-any.whl (20 kB)
+#11 16.31 Downloading itemadapter-0.12.2-py3-none-any.whl (18 kB)
+#11 16.35 Downloading itemloaders-1.3.2-py3-none-any.whl (12 kB)
+#11 16.39 Downloading jmespath-1.0.1-py3-none-any.whl (20 kB)
+#11 16.44 Downloading lxml-6.0.2-cp311-cp311-manylinux_2_26_x86_64.manylinux_2_28_x86_64.whl (5.2 MB)
+#11 16.82    ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü 5.2/5.2 MB 13.6 MB/s  0:00:00
+#11 16.86 Downloading outcome-1.3.0.post0-py2.py3-none-any.whl (10 kB)
+#11 16.90 Downloading packaging-25.0-py3-none-any.whl (66 kB)
+#11 16.95 Downloading parsel-1.10.0-py2.py3-none-any.whl (17 kB)
+#11 16.99 Downloading pillow-11.3.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (6.6 MB)
+#11 17.41    ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü 6.6/6.6 MB 15.8 MB/s  0:00:00
+#11 17.46 Downloading protego-0.5.0-py3-none-any.whl (10 kB)
+#11 17.50 Downloading psycopg2_binary-2.9.11-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (4.2 MB)
+#11 17.75    ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü 4.2/4.2 MB 16.3 MB/s  0:00:00
+#11 17.79 Downloading pyasn1-0.6.1-py3-none-any.whl (83 kB)
+#11 17.84 Downloading pyasn1_modules-0.4.2-py3-none-any.whl (181 kB)
+#11 17.90 Downloading pycparser-2.23-py3-none-any.whl (118 kB)
+#11 17.95 Downloading PyDispatcher-2.0.7-py3-none-any.whl (12 kB)
+#11 17.99 Downloading PyJWT-2.10.1-py3-none-any.whl (22 kB)
+#11 18.03 Downloading pyopenssl-25.3.0-py3-none-any.whl (57 kB)
+#11 18.08 Downloading PySocks-1.7.1-py3-none-any.whl (16 kB)
+#11 18.12 Downloading queuelib-1.8.0-py3-none-any.whl (13 kB)
+#11 18.16 Downloading requests-2.32.5-py3-none-any.whl (64 kB)
+#11 18.21 Downloading urllib3-2.5.0-py3-none-any.whl (129 kB)
+#11 18.25 Downloading requests_file-3.0.1-py2.py3-none-any.whl (4.5 kB)
+#11 18.30 Downloading scrapy-2.13.4-py3-none-any.whl (321 kB)
+#11 18.36 Downloading twisted-25.5.0-py3-none-any.whl (3.2 MB)
+#11 18.54    ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü 3.2/3.2 MB 19.1 MB/s  0:00:00
+#11 18.58 Downloading selenium-4.38.0-py3-none-any.whl (9.7 MB)
+#11 18.96    ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü 9.7/9.7 MB 26.0 MB/s  0:00:00
+#11 19.00 Downloading trio-0.32.0-py3-none-any.whl (512 kB)
+#11 19.08 Downloading trio_websocket-0.12.2-py3-none-any.whl (21 kB)
+#11 19.12 Downloading typing_extensions-4.15.0-py3-none-any.whl (44 kB)
+#11 19.17 Downloading websocket_client-1.9.0-py3-none-any.whl (82 kB)
+#11 19.21 Downloading service_identity-24.2.0-py3-none-any.whl (11 kB)
+#11 19.25 Downloading setuptools-80.9.0-py3-none-any.whl (1.2 MB)
+#11 19.32    ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü 1.2/1.2 MB 17.0 MB/s  0:00:00
+#11 19.36 Downloading sniffio-1.3.1-py3-none-any.whl (10 kB)
+#11 19.40 Downloading sortedcontainers-2.4.0-py2.py3-none-any.whl (29 kB)
+#11 19.45 Downloading sqlparse-0.5.3-py3-none-any.whl (44 kB)
+#11 19.49 Downloading tldextract-5.3.0-py3-none-any.whl (107 kB)
+#11 19.54 Downloading tzdata-2025.2-py2.py3-none-any.whl (347 kB)
+#11 19.59 Downloading uv-0.9.11-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (21.7 MB)
+#11 20.31    ΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöüΓöü 21.7/21.7 MB 30.0 MB/s  0:00:00
+#11 20.36 Downloading w3lib-2.3.1-py3-none-any.whl (21 kB)
+#11 20.40 Downloading whitenoise-6.9.0-py3-none-any.whl (20 kB)
+#11 20.44 Downloading wsproto-1.3.2-py3-none-any.whl (24 kB)
+#11 20.49 Downloading zope_interface-8.1.1-cp311-cp311-manylinux1_x86_64.manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_5_x86_64.whl (259 kB)
+#11 20.60 Building wheels for collected packages: Crawl, mysqlclient
+#11 20.61   Building wheel for Crawl (pyproject.toml): started
+#11 21.19   Building wheel for Crawl (pyproject.toml): finished with status 'done'
+#11 21.19   Created wheel for Crawl: filename=crawl-0.5.5-py3-none-any.whl size=5597 sha256=33ae55e92f927a8931ae77e4996d0cdf554bfa5b14120f034aeff6b101d52d17
+#11 21.19   Stored in directory: /tmp/pip-ephem-wheel-cache-o7lym1a0/wheels/62/b8/25/7b690c082e4a799d71df4e853fb575e47c5b80919908b11f73
+#11 21.19   Building wheel for mysqlclient (pyproject.toml): started
+#11 22.44   Building wheel for mysqlclient (pyproject.toml): finished with status 'done'
+#11 22.45   Created wheel for mysqlclient: filename=mysqlclient-2.2.7-cp311-cp311-linux_x86_64.whl size=136636 sha256=fb1ee97b1ef651a59bbb4c84697e59bb040aae5eda7145dac77bbc31031ca1a1
+#11 22.45   Stored in directory: /tmp/pip-ephem-wheel-cache-o7lym1a0/wheels/cd/5f/fb/dbe9e6e7e1e24f9e73164c77b5fdc19bd36240425835c0e635
+#11 22.45 Successfully built Crawl mysqlclient
+#11 22.54 Installing collected packages: sortedcontainers, PyDispatcher, Crawl, zope.interface, whitenoise, websocket-client, w3lib, uv, urllib3, tzdata, typing_extensions, sqlparse, sniffio, setuptools, queuelib, PySocks, PyJWT, pycparser, pyasn1, psycopg2-binary, Protego, pillow, packaging, mysqlclient, lxml, jmespath, itemadapter, idna, h11, filelock, defusedxml, cssselect, constantly, charset-normalizer, certifi, Automat, attrs, asgiref, wsproto, requests, pyasn1_modules, parsel, outcome, incremental, hyperlink, gunicorn, Django, cffi, Twisted, trio, requests-file, itemloaders, djangorestframework, django-tailwind, django-allauth, dj-database-url, cryptography, trio-websocket, tldextract, service-identity, pyOpenSSL, djangorestframework_simplejwt, selenium, Scrapy
+#11 23.32   Attempting uninstall: setuptools
+#11 23.33     Found existing installation: setuptools 79.0.1
+#11 23.38     Uninstalling setuptools-79.0.1:
+#11 23.65       Successfully uninstalled setuptools-79.0.1
+#11 34.10 
+#11 34.11 Successfully installed Automat-25.4.16 Crawl-0.5.5 Django-5.2.4 Protego-0.5.0 PyDispatcher-2.0.7 PyJWT-2.10.1 PySocks-1.7.1 Scrapy-2.13.4 Twisted-25.5.0 asgiref-3.9.1 attrs-25.4.0 certifi-2025.11.12 cffi-2.0.0 charset-normalizer-3.4.4 constantly-23.10.4 cryptography-46.0.3 cssselect-1.3.0 defusedxml-0.7.1 dj-database-url-2.3.0 django-allauth-65.13.1 django-tailwind-4.2.0 djangorestframework-3.16.1 djangorestframework_simplejwt-5.5.1 filelock-3.20.0 gunicorn-23.0.0 h11-0.16.0 hyperlink-21.0.0 idna-3.11 incremental-24.7.2 itemadapter-0.12.2 itemloaders-1.3.2 jmespath-1.0.1 lxml-6.0.2 mysqlclient-2.2.7 outcome-1.3.0.post0 packaging-25.0 parsel-1.10.0 pillow-11.3.0 psycopg2-binary-2.9.11 pyOpenSSL-25.3.0 pyasn1-0.6.1 pyasn1_modules-0.4.2 pycparser-2.23 queuelib-1.8.0 requests-2.32.5 requests-file-3.0.1 selenium-4.38.0 service-identity-24.2.0 setuptools-80.9.0 sniffio-1.3.1 sortedcontainers-2.4.0 sqlparse-0.5.3 tldextract-5.3.0 trio-0.32.0 trio-websocket-0.12.2 typing_extensions-4.15.0 tzdata-2025.2 urllib3-2.5.0 uv-0.9.11 w3lib-2.3.1 websocket-client-1.9.0 whitenoise-6.9.0 wsproto-1.3.2 zope.interface-8.1.1
+#11 34.11 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#11 DONE 35.0s
+
+#12 [6/8] COPY . /app/
+#12 DONE 5.3s
+
+#13 [7/8] COPY entrypoint.sh /app/
+#13 DONE 0.2s
+
+#14 [8/8] RUN chmod +x /app/entrypoint.sh
+#14 DONE 0.3s
+
+#15 exporting to image
+#15 exporting layers
+#15 exporting layers 9.3s done
+#15 exporting manifest sha256:96fe93624e30adc3880bc4ecacafd01d141db47dba735e0e44d5416184f19555 0.0s done
+#15 exporting config sha256:f062bd517ca1e4b9399a67194850ee7dd038da7dc696f63c6af3deed37bcbd6b 0.0s done
+#15 exporting attestation manifest sha256:076c8e98879463101815041dbd3df77dc5e9386ad6be86b676928043a45b642d 0.0s done
+#15 exporting manifest list sha256:3fd3a8c144493cde5d1f00f24b32c7ea5b68f327c263b20261852785c2de63c5
+#15 exporting manifest list sha256:3fd3a8c144493cde5d1f00f24b32c7ea5b68f327c263b20261852785c2de63c5 0.0s done
+#15 naming to docker.io/library/teamsuffer-web:latest done
+#15 unpacking to docker.io/library/teamsuffer-web:latest
+#15 unpacking to docker.io/library/teamsuffer-web:latest 12.1s done
+#15 DONE 21.5s
+
+#16 resolving provenance for metadata file
+#16 DONE 0.0s
+ teamsuffer-web  Built

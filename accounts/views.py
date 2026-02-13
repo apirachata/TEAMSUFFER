@@ -98,14 +98,57 @@ def profile_view(request):
     user_team_member = TeamMember.objects.filter(user=user).first()
     team = None
     members = []
+    team_standings = None
+    all_standings = []
     if user_team_member:
         team = user_team_member.team
         members = TeamMember.objects.filter(team=team).select_related('user', 'user__profile')
+        
+        # Get team's tournament registration and standings
+        # Get team's tournament registration and standings using service
+        from tournaments.models import TournamentRegistration
+        from tournaments.services import list_standings
+        
+        registration = TournamentRegistration.objects.filter(team=team).select_related('tournament').order_by('-registered_at').first()
+        if registration:
+            # Use the common service to calculate everything correctly (including manual overrides)
+            standings_data = list_standings(registration.tournament, include_pending=True)
+            
+            # Find my team in the results
+            for s in standings_data:
+                if s['team'].id == team.id:
+                    team_standings = {
+                        'tournament_name': registration.tournament.name,
+                        'tournament_id': registration.tournament.id,
+                        'status': registration.status,
+                        'played': s['played'],
+                        'won': s['won'],
+                        'lost': s['lost'],
+                        'score': s['score'],
+                        'points': s['points'],
+                    }
+                    break
+            
+            # Use the same data for the leaderboard list
+            all_standings = []
+            for s in standings_data:
+                all_standings.append({
+                    'rank': s['rank'],
+                    'team_name': s['team'].name,
+                    'is_my_team': s['team'].id == team.id,
+                    'played': s['played'],
+                    'won': s['won'],
+                    'lost': s['lost'],
+                    'score': s['score'],
+                    'points': s['points'],
+                })
 
     return render(request, 'account/profile.html', {
         'user_form': uform, 
         'profile_form': pform,
         'team': team,
         'members': members,
-        'user_team_member': user_team_member
+        'user_team_member': user_team_member,
+        'team_standings': team_standings,
+        'all_standings': all_standings
     })

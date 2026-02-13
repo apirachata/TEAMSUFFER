@@ -1,0 +1,1807 @@
+﻿docker : #0 building 
+with "desktop-linux" 
+instance using 
+docker driver
+At line:1 char:1
++ docker build . -f 
+Dockerfile 
+--no-cache 
+--progress=plain 
+2>&1 | Out-F ...
++ ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: (#0 buil   
+ ding wit...g doc    
+ker driver:Strin    
+g) [], RemoteExc    
+eption
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+
+#1 [internal] load 
+build definition 
+from Dockerfile
+#1 transferring 
+dockerfile: 748B done
+#1 DONE 0.0s
+
+#2 [internal] load 
+metadata for docker.i
+o/library/python:3.11
+-slim
+#2 DONE 1.0s
+
+#3 [internal] load 
+.dockerignore
+#3 transferring 
+context: 2B done
+#3 DONE 0.0s
+
+#4 [1/8] FROM docker.
+io/library/python:3.1
+1-slim@sha256:1dd3dca
+85e22886e44fcad1bb7cc
+ab6691dfa83db52214cf9
+e20696e095f3e36
+#4 resolve docker.io/
+library/python:3.11-s
+lim@sha256:1dd3dca85e
+22886e44fcad1bb7ccab6
+691dfa83db52214cf9e20
+696e095f3e36 0.0s 
+done
+#4 DONE 0.0s
+
+#5 [2/8] WORKDIR /app
+#5 CACHED
+
+#6 [internal] load 
+build context
+#6 transferring 
+context: 1.22MB 0.8s 
+done
+#6 DONE 0.8s
+
+#7 [3/8] RUN apt-get 
+update && apt-get 
+install -y --no-insta
+ll-recommends     
+gcc     libpq-dev    
+ && rm -rf 
+/var/lib/apt/lists/*
+#7 0.376 Hit:1 http:/
+/deb.debian.org/debia
+n trixie InRelease
+#7 0.412 Get:2 http:/
+/deb.debian.org/debia
+n trixie-updates 
+InRelease [47.3 kB]
+#7 0.464 Get:3 http:/
+/deb.debian.org/debia
+n-security 
+trixie-security 
+InRelease [43.4 kB]
+#7 0.698 Get:4 http:/
+/deb.debian.org/debia
+n trixie/main amd64 
+Packages [9670 kB]
+#7 1.208 Get:5 http:/
+/deb.debian.org/debia
+n 
+trixie-updates/main 
+amd64 Packages [5412 
+B]
+#7 1.261 Get:6 http:/
+/deb.debian.org/debia
+n-security 
+trixie-security/main 
+amd64 Packages [94.2 
+kB]
+#7 1.754 Fetched 
+9860 kB in 1s (6818 
+kB/s)
+#7 1.754 Reading 
+package lists...
+#7 2.283 Reading 
+package lists...
+#7 2.769 Building 
+dependency tree...
+#7 2.916 Reading 
+state information...
+#7 3.117 The 
+following additional 
+packages will be 
+installed:
+#7 3.117   binutils 
+binutils-common binut
+ils-x86-64-linux-gnu 
+cpp cpp-14
+#7 3.117   cpp-14-x86
+-64-linux-gnu 
+cpp-x86-64-linux-gnu 
+gcc-14 gcc-14-x86-64-
+linux-gnu
+#7 3.117   
+gcc-x86-64-linux-gnu 
+libasan8 libatomic1 
+libbinutils libcc1-0 
+libcom-err2
+#7 3.117   
+libctf-nobfd0 
+libctf0 
+libgcc-14-dev 
+libgomp1 libgprofng0 
+libgssapi-krb5-2
+#7 3.118   
+libhwasan0 libisl23 
+libitm1 libjansson4 
+libk5crypto3 
+libkeyutils1 
+libkrb5-3
+#7 3.118   
+libkrb5support0 
+libldap2 liblsan0 
+libmpc3 libmpfr6 
+libpq5 libquadmath0
+#7 3.119   
+libsasl2-2 
+libsasl2-modules-db 
+libsframe1 
+libssl-dev libtsan2 
+libubsan1
+#7 3.121 Suggested 
+packages:
+#7 3.121   
+binutils-doc 
+gprofng-gui 
+binutils-gold 
+cpp-doc 
+gcc-14-locales 
+cpp-14-doc
+#7 3.121   
+gcc-multilib make 
+manpages-dev 
+autoconf automake 
+libtool flex bison 
+gdb
+#7 3.121   gcc-doc 
+gcc-14-multilib 
+gcc-14-doc 
+gdb-x86-64-linux-gnu 
+krb5-doc krb5-user
+#7 3.121   
+postgresql-doc-17 
+libssl-doc
+#7 3.121 Recommended 
+packages:
+#7 3.121   libc6-dev 
+| libc-dev libc6-dev 
+libc-dev 
+krb5-locales 
+libldap-common
+#7 3.121   
+libsasl2-modules
+#7 3.239 The 
+following NEW 
+packages will be 
+installed:
+#7 3.239   binutils 
+binutils-common binut
+ils-x86-64-linux-gnu 
+cpp cpp-14
+#7 3.239   cpp-14-x86
+-64-linux-gnu 
+cpp-x86-64-linux-gnu 
+gcc gcc-14
+#7 3.239   gcc-14-x86
+-64-linux-gnu 
+gcc-x86-64-linux-gnu 
+libasan8 libatomic1 
+libbinutils
+#7 3.239   libcc1-0 
+libcom-err2 
+libctf-nobfd0 
+libctf0 
+libgcc-14-dev 
+libgomp1
+#7 3.239   
+libgprofng0 
+libgssapi-krb5-2 
+libhwasan0 libisl23 
+libitm1 libjansson4
+#7 3.239   
+libk5crypto3 
+libkeyutils1 
+libkrb5-3 
+libkrb5support0 
+libldap2 liblsan0
+#7 3.240   libmpc3 
+libmpfr6 libpq-dev 
+libpq5 libquadmath0 
+libsasl2-2
+#7 3.241   
+libsasl2-modules-db 
+libsframe1 
+libssl-dev libtsan2 
+libubsan1
+#7 3.323 0 upgraded, 
+43 newly installed, 
+0 to remove and 0 
+not upgraded.
+#7 3.323 Need to get 
+56.1 MB of archives.
+#7 3.323 After this 
+operation, 213 MB of 
+additional disk 
+space will be used.
+#7 3.323 Get:1 http:/
+/deb.debian.org/debia
+n trixie/main amd64 
+libsframe1 amd64 
+2.44-3 [78.4 kB]
+#7 3.443 Get:2 http:/
+/deb.debian.org/debia
+n trixie/main amd64 
+binutils-common 
+amd64 2.44-3 [2509 
+kB]
+#7 3.664 Get:3 http:/
+/deb.debian.org/debia
+n trixie/main amd64 
+libbinutils amd64 
+2.44-3 [534 kB]
+#7 3.770 Get:4 http:/
+/deb.debian.org/debia
+n trixie/main amd64 
+libgprofng0 amd64 
+2.44-3 [808 kB]
+#7 3.854 Get:5 http:/
+/deb.debian.org/debia
+n trixie/main amd64 
+libctf-nobfd0 amd64 
+2.44-3 [156 kB]
+#7 3.912 Get:6 http:/
+/deb.debian.org/debia
+n trixie/main amd64 
+libctf0 amd64 2.44-3 
+[88.6 kB]
+#7 3.953 Get:7 http:/
+/deb.debian.org/debia
+n trixie/main amd64 
+libjansson4 amd64 
+2.14-2+b3 [39.8 kB]
+#7 4.059 Get:8 http:/
+/deb.debian.org/debia
+n trixie/main amd64 b
+inutils-x86-64-linux-
+gnu amd64 2.44-3 
+[1014 kB]
+#7 4.155 Get:9 http:/
+/deb.debian.org/debia
+n trixie/main amd64 
+binutils amd64 
+2.44-3 [265 kB]
+#7 4.250 Get:10 http:
+//deb.debian.org/debi
+an trixie/main amd64 
+libisl23 amd64 
+0.27-1 [659 kB]
+#7 4.349 Get:11 http:
+//deb.debian.org/debi
+an trixie/main amd64 
+libmpfr6 amd64 
+4.2.2-1 [729 kB]
+#7 4.413 Get:12 http:
+//deb.debian.org/debi
+an trixie/main amd64 
+libmpc3 amd64 
+1.3.1-1+b3 [52.2 kB]
+#7 4.645 Get:13 http:
+//deb.debian.org/debi
+an trixie/main amd64 
+cpp-14-x86-64-linux-g
+nu amd64 14.2.0-19 
+[11.0 MB]
+#7 5.065 Get:14 http:
+//deb.debian.org/debi
+an trixie/main amd64 
+cpp-14 amd64 
+14.2.0-19 [1280 B]
+#7 5.103 Get:15 http:
+//deb.debian.org/debi
+an trixie/main amd64 
+cpp-x86-64-linux-gnu 
+amd64 4:14.2.0-1 
+[4840 B]
+#7 5.143 Get:16 http:
+//deb.debian.org/debi
+an trixie/main amd64 
+cpp amd64 4:14.2.0-1 
+[1568 B]
+#7 5.192 Get:17 http:
+//deb.debian.org/debi
+an trixie/main amd64 
+libcc1-0 amd64 
+14.2.0-19 [42.8 kB]
+#7 5.251 Get:18 http:
+//deb.debian.org/debi
+an trixie/main amd64 
+libgomp1 amd64 
+14.2.0-19 [137 kB]
+#7 5.289 Get:19 http:
+//deb.debian.org/debi
+an trixie/main amd64 
+libitm1 amd64 
+14.2.0-19 [26.0 kB]
+#7 5.322 Get:20 http:
+//deb.debian.org/debi
+an trixie/main amd64 
+libatomic1 amd64 
+14.2.0-19 [9308 B]
+#7 5.460 Get:21 http:
+//deb.debian.org/debi
+an trixie/main amd64 
+libasan8 amd64 
+14.2.0-19 [2725 kB]
+#7 5.700 Get:22 http:
+//deb.debian.org/debi
+an trixie/main amd64 
+liblsan0 amd64 
+14.2.0-19 [1204 kB]
+#7 5.867 Get:23 http:
+//deb.debian.org/debi
+an trixie/main amd64 
+libtsan2 amd64 
+14.2.0-19 [2460 kB]
+#7 6.041 Get:24 http:
+//deb.debian.org/debi
+an trixie/main amd64 
+libubsan1 amd64 
+14.2.0-19 [1074 kB]
+#7 6.173 Get:25 http:
+//deb.debian.org/debi
+an trixie/main amd64 
+libhwasan0 amd64 
+14.2.0-19 [1488 kB]
+#7 6.335 Get:26 http:
+//deb.debian.org/debi
+an trixie/main amd64 
+libquadmath0 amd64 
+14.2.0-19 [145 kB]
+#7 6.452 Get:27 http:
+//deb.debian.org/debi
+an trixie/main amd64 
+libgcc-14-dev amd64 
+14.2.0-19 [2672 kB]
+#7 6.862 Get:28 http:
+//deb.debian.org/debi
+an trixie/main amd64 
+gcc-14-x86-64-linux-g
+nu amd64 14.2.0-19 
+[21.4 MB]
+#7 8.251 Get:29 http:
+//deb.debian.org/debi
+an trixie/main amd64 
+gcc-14 amd64 
+14.2.0-19 [540 kB]
+#7 8.294 Get:30 http:
+//deb.debian.org/debi
+an trixie/main amd64 
+gcc-x86-64-linux-gnu 
+amd64 4:14.2.0-1 
+[1436 B]
+#7 8.329 Get:31 http:
+//deb.debian.org/debi
+an trixie/main amd64 
+gcc amd64 4:14.2.0-1 
+[5136 B]
+#7 8.369 Get:32 http:
+//deb.debian.org/debi
+an trixie/main amd64 
+libcom-err2 amd64 
+1.47.2-3+b3 [25.0 kB]
+#7 8.409 Get:33 http:
+//deb.debian.org/debi
+an trixie/main amd64 
+libkrb5support0 
+amd64 1.21.3-5 [33.0 
+kB]
+#7 8.463 Get:34 http:
+//deb.debian.org/debi
+an trixie/main amd64 
+libk5crypto3 amd64 
+1.21.3-5 [81.5 kB]
+#7 8.500 Get:35 http:
+//deb.debian.org/debi
+an trixie/main amd64 
+libkeyutils1 amd64 
+1.6.3-6 [9456 B]
+#7 8.580 Get:36 http:
+//deb.debian.org/debi
+an trixie/main amd64 
+libkrb5-3 amd64 
+1.21.3-5 [326 kB]
+#7 8.649 Get:37 http:
+//deb.debian.org/debi
+an trixie/main amd64 
+libgssapi-krb5-2 
+amd64 1.21.3-5 [138 
+kB]
+#7 8.689 Get:38 http:
+//deb.debian.org/debi
+an trixie/main amd64 
+libsasl2-modules-db 
+amd64 2.1.28+dfsg1-9 
+[19.8 kB]
+#7 8.740 Get:39 http:
+//deb.debian.org/debi
+an trixie/main amd64 
+libsasl2-2 amd64 
+2.1.28+dfsg1-9 [57.5 
+kB]
+#7 8.812 Get:40 http:
+//deb.debian.org/debi
+an trixie/main amd64 
+libldap2 amd64 
+2.6.10+dfsg-1 [194 
+kB]
+#7 8.884 Get:41 http:
+//deb.debian.org/debi
+an trixie/main amd64 
+libpq5 amd64 
+17.6-0+deb13u1 [228 
+kB]
+#7 9.013 Get:42 http:
+//deb.debian.org/debi
+an trixie/main amd64 
+libssl-dev amd64 
+3.5.4-1~deb13u1 
+[2957 kB]
+#7 9.158 Get:43 http:
+//deb.debian.org/debi
+an trixie/main amd64 
+libpq-dev amd64 
+17.6-0+deb13u1 [150 
+kB]
+#7 9.300 debconf: 
+unable to initialize 
+frontend: Dialog
+#7 9.300 debconf: 
+(TERM is not set, so 
+the dialog frontend 
+is not usable.)
+#7 9.300 debconf: 
+falling back to 
+frontend: Readline
+#7 9.300 debconf: 
+unable to initialize 
+frontend: Readline
+#7 9.300 debconf: 
+(Can't locate 
+Term/ReadLine.pm in 
+@INC (you may need 
+to install the 
+Term::ReadLine 
+module) (@INC 
+entries checked: 
+/etc/perl /usr/local/
+lib/x86_64-linux-gnu/
+perl/5.40.1 /usr/loca
+l/share/perl/5.40.1 /
+usr/lib/x86_64-linux-
+gnu/perl5/5.40 
+/usr/share/perl5 /usr
+/lib/x86_64-linux-gnu
+/perl-base /usr/lib/x
+86_64-linux-gnu/perl/
+5.40 
+/usr/share/perl/5.40 
+/usr/local/lib/site_p
+erl) at /usr/share/pe
+rl5/Debconf/FrontEnd/
+Readline.pm line 8, 
+<STDIN> line 43.)
+#7 9.300 debconf: 
+falling back to 
+frontend: Teletype
+#7 9.307 debconf: 
+unable to initialize 
+frontend: Teletype
+#7 9.307 debconf: 
+(This frontend 
+requires a 
+controlling tty.)
+#7 9.307 debconf: 
+falling back to 
+frontend: 
+Noninteractive
+#7 10.39 Fetched 
+56.1 MB in 6s (9516 
+kB/s)
+#7 10.42 Selecting 
+previously 
+unselected package 
+libsframe1:amd64.
+#7 10.42 (Reading 
+database ... 
+(Reading database 
+... 5%
+(Reading database 
+... 10%
+(Reading database 
+... 15%
+(Reading database 
+... 20%
+(Reading database 
+... 25%
+(Reading database 
+... 30%
+(Reading database 
+... 35%
+(Reading database 
+... 40%
+(Reading database 
+... 45%
+(Reading database 
+... 50%
+(Reading database 
+... 55%
+(Reading database 
+... 60%
+(Reading database 
+... 65%
+(Reading database 
+... 70%
+(Reading database 
+... 75%
+(Reading database 
+... 80%
+(Reading database 
+... 85%
+(Reading database 
+... 90%
+(Reading database 
+... 95%
+(Reading database 
+... 100%
+(Reading database 
+... 5644 files and 
+directories 
+currently installed.)
+#7 10.43 Preparing 
+to unpack .../00-libs
+frame1_2.44-3_amd64.d
+eb ...
+#7 10.44 Unpacking 
+libsframe1:amd64 
+(2.44-3) ...
+#7 10.49 Selecting 
+previously 
+unselected package bi
+nutils-common:amd64.
+#7 10.49 Preparing 
+to unpack .../01-binu
+tils-common_2.44-3_am
+d64.deb ...
+#7 10.50 Unpacking bi
+nutils-common:amd64 
+(2.44-3) ...
+#7 10.64 Selecting 
+previously 
+unselected package 
+libbinutils:amd64.
+#7 10.64 Preparing 
+to unpack .../02-libb
+inutils_2.44-3_amd64.
+deb ...
+#7 10.65 Unpacking 
+libbinutils:amd64 
+(2.44-3) ...
+#7 10.72 Selecting 
+previously 
+unselected package 
+libgprofng0:amd64.
+#7 10.72 Preparing 
+to unpack .../03-libg
+profng0_2.44-3_amd64.
+deb ...
+#7 10.72 Unpacking 
+libgprofng0:amd64 
+(2.44-3) ...
+#7 10.80 Selecting 
+previously 
+unselected package 
+libctf-nobfd0:amd64.
+#7 10.81 Preparing 
+to unpack .../04-libc
+tf-nobfd0_2.44-3_amd6
+4.deb ...
+#7 10.81 Unpacking 
+libctf-nobfd0:amd64 
+(2.44-3) ...
+#7 10.87 Selecting 
+previously 
+unselected package 
+libctf0:amd64.
+#7 10.87 Preparing 
+to unpack .../05-libc
+tf0_2.44-3_amd64.deb 
+...
+#7 10.87 Unpacking 
+libctf0:amd64 
+(2.44-3) ...
+#7 10.93 Selecting 
+previously 
+unselected package 
+libjansson4:amd64.
+#7 10.93 Preparing 
+to unpack .../06-libj
+ansson4_2.14-2+b3_amd
+64.deb ...
+#7 10.93 Unpacking 
+libjansson4:amd64 
+(2.14-2+b3) ...
+#7 10.98 Selecting 
+previously 
+unselected package bi
+nutils-x86-64-linux-g
+nu.
+#7 10.98 Preparing 
+to unpack .../07-binu
+tils-x86-64-linux-gnu
+_2.44-3_amd64.deb ...
+#7 10.98 Unpacking bi
+nutils-x86-64-linux-g
+nu (2.44-3) ...
+#7 11.10 Selecting 
+previously 
+unselected package 
+binutils.
+#7 11.10 Preparing 
+to unpack .../08-binu
+tils_2.44-3_amd64.deb
+ ...
+#7 11.11 Unpacking 
+binutils (2.44-3) ...
+#7 11.17 Selecting 
+previously 
+unselected package 
+libisl23:amd64.
+#7 11.17 Preparing 
+to unpack .../09-libi
+sl23_0.27-1_amd64.deb
+ ...
+#7 11.17 Unpacking 
+libisl23:amd64 
+(0.27-1) ...
+#7 11.25 Selecting 
+previously 
+unselected package 
+libmpfr6:amd64.
+#7 11.25 Preparing 
+to unpack .../10-libm
+pfr6_4.2.2-1_amd64.de
+b ...
+#7 11.26 Unpacking 
+libmpfr6:amd64 
+(4.2.2-1) ...
+#7 11.32 Selecting 
+previously 
+unselected package 
+libmpc3:amd64.
+#7 11.32 Preparing 
+to unpack .../11-libm
+pc3_1.3.1-1+b3_amd64.
+deb ...
+#7 11.32 Unpacking 
+libmpc3:amd64 
+(1.3.1-1+b3) ...
+#7 11.37 Selecting 
+previously 
+unselected package cp
+p-14-x86-64-linux-gnu
+.
+#7 11.37 Preparing 
+to unpack .../12-cpp-
+14-x86-64-linux-gnu_1
+4.2.0-19_amd64.deb 
+...
+#7 11.38 Unpacking cp
+p-14-x86-64-linux-gnu
+ (14.2.0-19) ...
+#7 11.77 Selecting 
+previously 
+unselected package 
+cpp-14.
+#7 11.77 Preparing 
+to unpack .../13-cpp-
+14_14.2.0-19_amd64.de
+b ...
+#7 11.78 Unpacking 
+cpp-14 (14.2.0-19) 
+...
+#7 11.82 Selecting 
+previously 
+unselected package 
+cpp-x86-64-linux-gnu.
+#7 11.82 Preparing 
+to unpack .../14-cpp-
+x86-64-linux-gnu_4%3a
+14.2.0-1_amd64.deb 
+...
+#7 11.82 Unpacking 
+cpp-x86-64-linux-gnu 
+(4:14.2.0-1) ...
+#7 11.91 Selecting 
+previously 
+unselected package 
+cpp.
+#7 11.91 Preparing 
+to unpack .../15-cpp_
+4%3a14.2.0-1_amd64.de
+b ...
+#7 11.92 Unpacking 
+cpp (4:14.2.0-1) ...
+#7 11.97 Selecting 
+previously 
+unselected package 
+libcc1-0:amd64.
+#7 11.97 Preparing 
+to unpack .../16-libc
+c1-0_14.2.0-19_amd64.
+deb ...
+#7 11.98 Unpacking 
+libcc1-0:amd64 
+(14.2.0-19) ...
+#7 12.03 Selecting 
+previously 
+unselected package 
+libgomp1:amd64.
+#7 12.03 Preparing 
+to unpack .../17-libg
+omp1_14.2.0-19_amd64.
+deb ...
+#7 12.04 Unpacking 
+libgomp1:amd64 
+(14.2.0-19) ...
+#7 12.10 Selecting 
+previously 
+unselected package 
+libitm1:amd64.
+#7 12.10 Preparing 
+to unpack .../18-libi
+tm1_14.2.0-19_amd64.d
+eb ...
+#7 12.10 Unpacking 
+libitm1:amd64 
+(14.2.0-19) ...
+#7 12.16 Selecting 
+previously 
+unselected package 
+libatomic1:amd64.
+#7 12.16 Preparing 
+to unpack .../19-liba
+tomic1_14.2.0-19_amd6
+4.deb ...
+#7 12.17 Unpacking 
+libatomic1:amd64 
+(14.2.0-19) ...
+#7 12.22 Selecting 
+previously 
+unselected package 
+libasan8:amd64.
+#7 12.22 Preparing 
+to unpack .../20-liba
+san8_14.2.0-19_amd64.
+deb ...
+#7 12.22 Unpacking 
+libasan8:amd64 
+(14.2.0-19) ...
+#7 12.38 Selecting 
+previously 
+unselected package 
+liblsan0:amd64.
+#7 12.38 Preparing 
+to unpack .../21-libl
+san0_14.2.0-19_amd64.
+deb ...
+#7 12.38 Unpacking 
+liblsan0:amd64 
+(14.2.0-19) ...
+#7 12.48 Selecting 
+previously 
+unselected package 
+libtsan2:amd64.
+#7 12.48 Preparing 
+to unpack .../22-libt
+san2_14.2.0-19_amd64.
+deb ...
+#7 12.48 Unpacking 
+libtsan2:amd64 
+(14.2.0-19) ...
+#7 12.63 Selecting 
+previously 
+unselected package 
+libubsan1:amd64.
+#7 12.63 Preparing 
+to unpack .../23-libu
+bsan1_14.2.0-19_amd64
+.deb ...
+#7 12.63 Unpacking 
+libubsan1:amd64 
+(14.2.0-19) ...
+#7 12.72 Selecting 
+previously 
+unselected package 
+libhwasan0:amd64.
+#7 12.72 Preparing 
+to unpack .../24-libh
+wasan0_14.2.0-19_amd6
+4.deb ...
+#7 12.73 Unpacking 
+libhwasan0:amd64 
+(14.2.0-19) ...
+#7 12.83 Selecting 
+previously 
+unselected package 
+libquadmath0:amd64.
+#7 12.83 Preparing 
+to unpack .../25-libq
+uadmath0_14.2.0-19_am
+d64.deb ...
+#7 12.83 Unpacking 
+libquadmath0:amd64 
+(14.2.0-19) ...
+#7 12.88 Selecting 
+previously 
+unselected package 
+libgcc-14-dev:amd64.
+#7 12.88 Preparing 
+to unpack .../26-libg
+cc-14-dev_14.2.0-19_a
+md64.deb ...
+#7 12.89 Unpacking 
+libgcc-14-dev:amd64 
+(14.2.0-19) ...
+#7 13.04 Selecting 
+previously 
+unselected package gc
+c-14-x86-64-linux-gnu
+.
+#7 13.04 Preparing 
+to unpack .../27-gcc-
+14-x86-64-linux-gnu_1
+4.2.0-19_amd64.deb 
+...
+#7 13.04 Unpacking gc
+c-14-x86-64-linux-gnu
+ (14.2.0-19) ...
+#7 13.56 Selecting 
+previously 
+unselected package 
+gcc-14.
+#7 13.56 Preparing 
+to unpack .../28-gcc-
+14_14.2.0-19_amd64.de
+b ...
+#7 13.57 Unpacking 
+gcc-14 (14.2.0-19) 
+...
+#7 13.62 Selecting 
+previously 
+unselected package 
+gcc-x86-64-linux-gnu.
+#7 13.62 Preparing 
+to unpack .../29-gcc-
+x86-64-linux-gnu_4%3a
+14.2.0-1_amd64.deb 
+...
+#7 13.63 Unpacking 
+gcc-x86-64-linux-gnu 
+(4:14.2.0-1) ...
+#7 13.67 Selecting 
+previously 
+unselected package 
+gcc.
+#7 13.67 Preparing 
+to unpack .../30-gcc_
+4%3a14.2.0-1_amd64.de
+b ...
+#7 13.68 Unpacking 
+gcc (4:14.2.0-1) ...
+#7 13.73 Selecting 
+previously 
+unselected package 
+libcom-err2:amd64.
+#7 13.74 Preparing 
+to unpack .../31-libc
+om-err2_1.47.2-3+b3_a
+md64.deb ...
+#7 13.74 Unpacking 
+libcom-err2:amd64 
+(1.47.2-3+b3) ...
+#7 13.79 Selecting 
+previously 
+unselected package li
+bkrb5support0:amd64.
+#7 13.79 Preparing 
+to unpack .../32-libk
+rb5support0_1.21.3-5_
+amd64.deb ...
+#7 13.80 Unpacking li
+bkrb5support0:amd64 
+(1.21.3-5) ...
+#7 13.85 Selecting 
+previously 
+unselected package 
+libk5crypto3:amd64.
+#7 13.85 Preparing 
+to unpack .../33-libk
+5crypto3_1.21.3-5_amd
+64.deb ...
+#7 13.86 Unpacking 
+libk5crypto3:amd64 
+(1.21.3-5) ...
+#7 13.91 Selecting 
+previously 
+unselected package 
+libkeyutils1:amd64.
+#7 13.91 Preparing 
+to unpack .../34-libk
+eyutils1_1.6.3-6_amd6
+4.deb ...
+#7 13.92 Unpacking 
+libkeyutils1:amd64 
+(1.6.3-6) ...
+#7 13.97 Selecting 
+previously 
+unselected package 
+libkrb5-3:amd64.
+#7 13.97 Preparing 
+to unpack .../35-libk
+rb5-3_1.21.3-5_amd64.
+deb ...
+#7 13.98 Unpacking 
+libkrb5-3:amd64 
+(1.21.3-5) ...
+#7 14.05 Selecting 
+previously 
+unselected package li
+bgssapi-krb5-2:amd64.
+#7 14.05 Preparing 
+to unpack .../36-libg
+ssapi-krb5-2_1.21.3-5
+_amd64.deb ...
+#7 14.05 Unpacking li
+bgssapi-krb5-2:amd64 
+(1.21.3-5) ...
+#7 14.10 Selecting 
+previously 
+unselected package li
+bsasl2-modules-db:amd
+64.
+#7 14.10 Preparing 
+to unpack .../37-libs
+asl2-modules-db_2.1.2
+8+dfsg1-9_amd64.deb 
+...
+#7 14.11 Unpacking li
+bsasl2-modules-db:amd
+64 (2.1.28+dfsg1-9) 
+...
+#7 14.16 Selecting 
+previously 
+unselected package 
+libsasl2-2:amd64.
+#7 14.16 Preparing 
+to unpack .../38-libs
+asl2-2_2.1.28+dfsg1-9
+_amd64.deb ...
+#7 14.17 Unpacking 
+libsasl2-2:amd64 
+(2.1.28+dfsg1-9) ...
+#7 14.23 Selecting 
+previously 
+unselected package 
+libldap2:amd64.
+#7 14.23 Preparing 
+to unpack .../39-libl
+dap2_2.6.10+dfsg-1_am
+d64.deb ...
+#7 14.24 Unpacking 
+libldap2:amd64 
+(2.6.10+dfsg-1) ...
+#7 14.30 Selecting 
+previously 
+unselected package 
+libpq5:amd64.
+#7 14.30 Preparing 
+to unpack .../40-libp
+q5_17.6-0+deb13u1_amd
+64.deb ...
+#7 14.31 Unpacking 
+libpq5:amd64 
+(17.6-0+deb13u1) ...
+#7 14.36 Selecting 
+previously 
+unselected package 
+libssl-dev:amd64.
+#7 14.36 Preparing 
+to unpack .../41-libs
+sl-dev_3.5.4-1~deb13u
+1_amd64.deb ...
+#7 14.37 Unpacking 
+libssl-dev:amd64 
+(3.5.4-1~deb13u1) ...
+#7 14.53 Selecting 
+previously 
+unselected package 
+libpq-dev.
+#7 14.53 Preparing 
+to unpack .../42-libp
+q-dev_17.6-0+deb13u1_
+amd64.deb ...
+#7 14.54 Unpacking 
+libpq-dev 
+(17.6-0+deb13u1) ...
+#7 14.60 Setting up 
+libkeyutils1:amd64 
+(1.6.3-6) ...
+#7 14.63 Setting up b
+inutils-common:amd64 
+(2.44-3) ...
+#7 14.64 Setting up 
+libctf-nobfd0:amd64 
+(2.44-3) ...
+#7 14.66 Setting up 
+libcom-err2:amd64 
+(1.47.2-3+b3) ...
+#7 14.68 Setting up 
+libgomp1:amd64 
+(14.2.0-19) ...
+#7 14.70 Setting up 
+libsframe1:amd64 
+(2.44-3) ...
+#7 14.72 Setting up 
+libjansson4:amd64 
+(2.14-2+b3) ...
+#7 14.74 Setting up l
+ibkrb5support0:amd64 
+(1.21.3-5) ...
+#7 14.76 Setting up l
+ibsasl2-modules-db:am
+d64 (2.1.28+dfsg1-9) 
+...
+#7 14.78 Setting up 
+libmpfr6:amd64 
+(4.2.2-1) ...
+#7 14.79 Setting up 
+libquadmath0:amd64 
+(14.2.0-19) ...
+#7 14.81 Setting up 
+libssl-dev:amd64 
+(3.5.4-1~deb13u1) ...
+#7 14.83 Setting up 
+libmpc3:amd64 
+(1.3.1-1+b3) ...
+#7 14.85 Setting up 
+libatomic1:amd64 
+(14.2.0-19) ...
+#7 14.87 Setting up 
+libk5crypto3:amd64 
+(1.21.3-5) ...
+#7 14.89 Setting up 
+libsasl2-2:amd64 
+(2.1.28+dfsg1-9) ...
+#7 14.90 Setting up 
+libubsan1:amd64 
+(14.2.0-19) ...
+#7 14.92 Setting up 
+libhwasan0:amd64 
+(14.2.0-19) ...
+#7 14.94 Setting up 
+libasan8:amd64 
+(14.2.0-19) ...
+#7 14.95 Setting up 
+libkrb5-3:amd64 
+(1.21.3-5) ...
+#7 14.97 Setting up 
+libtsan2:amd64 
+(14.2.0-19) ...
+#7 14.99 Setting up 
+libbinutils:amd64 
+(2.44-3) ...
+#7 15.00 Setting up 
+libisl23:amd64 
+(0.27-1) ...
+#7 15.01 Setting up 
+libcc1-0:amd64 
+(14.2.0-19) ...
+#7 15.03 Setting up 
+libldap2:amd64 
+(2.6.10+dfsg-1) ...
+#7 15.05 Setting up 
+liblsan0:amd64 
+(14.2.0-19) ...
+#7 15.06 Setting up 
+libitm1:amd64 
+(14.2.0-19) ...
+#7 15.08 Setting up 
+libctf0:amd64 
+(2.44-3) ...
+#7 15.09 Setting up 
+libgprofng0:amd64 
+(2.44-3) ...
+#7 15.11 Setting up l
+ibgssapi-krb5-2:amd64
+ (1.21.3-5) ...
+#7 15.13 Setting up c
+pp-14-x86-64-linux-gn
+u (14.2.0-19) ...
+#7 15.14 Setting up 
+cpp-14 (14.2.0-19) 
+...
+#7 15.16 Setting up 
+libgcc-14-dev:amd64 
+(14.2.0-19) ...
+#7 15.17 Setting up b
+inutils-x86-64-linux-
+gnu (2.44-3) ...
+#7 15.19 Setting up 
+cpp-x86-64-linux-gnu 
+(4:14.2.0-1) ...
+#7 15.20 Setting up 
+libpq5:amd64 
+(17.6-0+deb13u1) ...
+#7 15.22 Setting up 
+libpq-dev 
+(17.6-0+deb13u1) ...
+#7 15.24 Setting up 
+binutils (2.44-3) ...
+#7 15.26 Setting up 
+cpp (4:14.2.0-1) ...
+#7 15.29 Setting up g
+cc-14-x86-64-linux-gn
+u (14.2.0-19) ...
+#7 15.30 Setting up 
+gcc-x86-64-linux-gnu 
+(4:14.2.0-1) ...
+#7 15.32 Setting up 
+gcc-14 (14.2.0-19) 
+...
+#7 15.33 Setting up 
+gcc (4:14.2.0-1) ...
+#7 15.36 Processing 
+triggers for 
+libc-bin (2.41-12) 
+...
+#7 DONE 15.6s
+
+#8 [4/8] COPY 
+requirements.txt 
+/app/
+#8 DONE 0.1s
+
+#9 [5/8] RUN pip 
+install --upgrade 
+pip && pip install 
+--no-cache-dir -r 
+requirements.txt
+#9 1.266 Requirement 
+already satisfied: 
+pip in /usr/local/lib
+/python3.11/site-pack
+ages (24.0)
+#9 1.397 Collecting 
+pip
+#9 1.593   
+Downloading pip-25.3-
+py3-none-any.whl.meta
+data (4.7 kB)
+#9 1.647 Downloading 
+pip-25.3-py3-none-any
+.whl (1.8 MB)
+#9 1.921    ΓöüΓöüΓöü
+ΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+ΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+ΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+ΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+ΓöüΓöüΓöüΓöüΓöüΓöüΓöü
+ΓöüΓöü 1.8/1.8 MB 
+6.6 MB/s eta 0:00:00
+#9 1.960 Installing 
+collected packages: 
+pip
+#9 1.960   
+Attempting 
+uninstall: pip
+#9 1.962     Found 
+existing 
+installation: pip 
+24.0
+#9 2.000     
+Uninstalling 
+pip-24.0:
+#9 2.229       
+Successfully 
+uninstalled pip-24.0
+#9 3.001 
+Successfully 
+installed pip-25.3
+#9 3.001 WARNING: 
+Running pip as the 
+'root' user can 
+result in broken 
+permissions and 
+conflicting 
+behaviour with the 
+system package 
+manager. It is 
+recommended to use a 
+virtual environment 
+instead: https://pip.
+pypa.io/warnings/venv
+#9 3.916 Collecting 
+asgiref==3.9.1 (from 
+-r requirements.txt 
+(line 1))
+#9 4.100   
+Downloading asgiref-3
+.9.1-py3-none-any.whl
+.metadata (9.3 kB)
+#9 4.127 Collecting 
+attrs==25.4.0 (from 
+-r requirements.txt 
+(line 2))
+#9 4.170   
+Downloading attrs-25.
+4.0-py3-none-any.whl.
+metadata (10 kB)
+#9 4.195 Collecting 
+Automat==25.4.16 
+(from -r 
+requirements.txt 
+(line 3))
+#9 4.239   
+Downloading automat-2
+5.4.16-py3-none-any.w
+hl.metadata (8.4 kB)
+#9 4.273 Collecting 
+certifi==2025.11.12 
+(from -r 
+requirements.txt 
+(line 4))
+#9 4.315   
+Downloading certifi-2
+025.11.12-py3-none-an
+y.whl.metadata (2.5 
+kB)
+#9 4.460 Collecting 
+cffi==2.0.0 (from -r 
+requirements.txt 
+(line 5))
+#9 4.503   
+Downloading cffi-2.0.
+0-cp311-cp311-manylin
+ux2014_x86_64.manylin
+ux_2_17_x86_64.whl.me
+tadata (2.6 kB)
+#9 4.577 Collecting c
+harset-normalizer==3.
+4.4 (from -r 
+requirements.txt 
+(line 6))
+#9 4.618   
+Downloading charset_n
+ormalizer-3.4.4-cp311
+-cp311-manylinux2014_
+x86_64.manylinux_2_17
+_x86_64.manylinux_2_2
+8_x86_64.whl.metadata
+ (37 kB)
+#9 4.660 Collecting 
+constantly==23.10.4 
+(from -r 
+requirements.txt 
+(line 7))
+#9 4.702   
+Downloading constantl
+y-23.10.4-py3-none-an
+y.whl.metadata (1.8 
+kB)
+#9 4.723 Collecting 
+Crawl==0.5.5 (from 
+-r requirements.txt 
+(line 8))
+#9 4.766   
+Downloading 
+Crawl-0.5.5.tar.gz 
+(6.6 kB)
+#9 4.773   
+Installing build 
+dependencies: started
+#9 6.306   
+Installing build 
+dependencies: 
+finished with status 
+'done'
+#9 6.308   Getting 
+requirements to 
+build wheel: started
+#9 6.776   Getting 
+requirements to 
+build wheel: 
+finished with status 
+'done'
+#9 6.778   Preparing 
+metadata 
+(pyproject.toml): 
+started
+#9 7.258   Preparing 
+metadata 
+(pyproject.toml): 
+finished with status 
+'done'
+#9 7.409 Collecting 
+cryptography==46.0.3 
+(from -r 
+requirements.txt 
+(line 9))
+#9 7.451   
+Downloading cryptogra
+phy-46.0.3-cp311-abi3
+-manylinux_2_34_x86_6
+4.whl.metadata (5.7 
+kB)
+#9 7.476 Collecting 
+cssselect==1.3.0 
+(from -r 
+requirements.txt 
+(line 10))
+#9 7.518   
+Downloading cssselect
+-1.3.0-py3-none-any.w
+hl.metadata (2.6 kB)
+#9 7.539 Collecting 
+defusedxml==0.7.1 
+(from -r 
+requirements.txt 
+(line 11))
+#9 7.581   
+Downloading defusedxm
+l-0.7.1-py2.py3-none-
+any.whl.metadata (32 
+kB)
+#9 7.643 Collecting 
+Django==5.2.4 (from 
+-r requirements.txt 
+(line 12))
+#9 7.686   
+Downloading django-5.
+2.4-py3-none-any.whl.
+metadata (4.1 kB)
+#9 7.710 Collecting d
+jango-allauth==65.13.
+1 (from -r 
+requirements.txt 
+(line 13))
+#9 7.753   
+Downloading django_al
+lauth-65.13.1-py3-non
+e-any.whl.metadata 
+(9.2 kB)
+#9 7.781 Collecting d
+jango-tailwind==4.2.0
+ (from -r 
+requirements.txt 
+(line 14))
+#9 7.836   
+Downloading django_ta
+ilwind-4.2.0-py3-none
+-any.whl.metadata 
+(4.4 kB)
+#9 7.886 Collecting d
+jangorestframework==3
+.16.1 (from -r 
+requirements.txt 
+(line 15))
+#9 7.929   
+Downloading djangores
+tframework-3.16.1-py3
+-none-any.whl.metadat
+a (11 kB)
+#9 7.953 Collecting d
+jangorestframework_si
+mplejwt==5.5.1 (from 
+-r requirements.txt 
+(line 16))
+#9 7.996   
+Downloading djangores
+tframework_simplejwt-
+5.5.1-py3-none-any.wh
+l.metadata (4.6 kB)
+#9 8.025 Collecting 
+filelock==3.20.0 
+(from -r 
+requirements.txt 
+(line 17))
+#9 8.067   
+Downloading filelock-
+3.20.0-py3-none-any.w
+hl.metadata (2.1 kB)
+#9 8.088 Collecting 
+h11==0.16.0 (from -r 
+requirements.txt 
+(line 18))
+#9 8.130   
+Downloading h11-0.16.
+0-py3-none-any.whl.me
+tadata (8.3 kB)
+#9 8.152 Collecting 
+hyperlink==21.0.0 
+(from -r 
+requirements.txt 
+(line 19))
+#9 8.194   
+Downloading hyperlink
+-21.0.0-py2.py3-none-
+any.whl.metadata 
+(1.5 kB)
+#9 8.215 Collecting 
+idna==3.11 (from -r 
+requirements.txt 
+(line 20))
+#9 8.257   
+Downloading idna-3.11
+-py3-none-any.whl.met
+adata (8.4 kB)
+#9 8.279 Collecting 
+incremental==24.7.2 
+(from -r 
+requirements.txt 
+(line 21))
+#9 8.323   
+Downloading increment
+al-24.7.2-py3-none-an
+y.whl.metadata (8.1 
+kB)
+#9 8.346 Collecting 
+itemadapter==0.12.2 
+(from -r 
+requirements.txt 
+(line 22))
+#9 8.389   
+Downloading itemadapt
+er-0.12.2-py3-none-an
+y.whl.metadata (22 
+kB)
+#9 8.430 Collecting 
+itemloaders==1.3.2 
+(from -r 
+requirements.txt 
+(line 23))
+#9 8.474   
+Downloading itemloade
+rs-1.3.2-py3-none-any
+.whl.metadata (3.9 
+kB)
+#9 8.495 Collecting 
+jmespath==1.0.1 
+(from -r 
+requirements.txt 
+(line 24))
+#9 8.537   
+Downloading jmespath-
+1.0.1-py3-none-any.wh
+l.metadata (7.6 kB)
+#9 8.691 Collecting 
+lxml==6.0.2 (from -r 
+requirements.txt 
+(line 25))
+#9 8.734   
+Downloading lxml-6.0.
+2-cp311-cp311-manylin
+ux_2_26_x86_64.manyli
+nux_2_28_x86_64.whl.m
+etadata (3.6 kB)
+#9 8.762 Collecting 
+mysqlclient==2.2.7 
+(from -r 
+requirements.txt 
+(line 26))
+#9 8.803   
+Downloading mysqlclie
+nt-2.2.7.tar.gz (91 
+kB)
+#9 8.868   
+Installing build 
+dependencies: started
+#9 9.781   
+Installing build 
+dependencies: 
+finished with status 
+'done'
+#9 9.782   Getting 
+requirements to 
+build wheel: started
+#9 10.23   Getting 
+requirements to 
+build wheel: 
+finished with status 
+'error'
+#9 10.23   error: sub
+process-exited-with-e
+rror
+#9 10.23   
+#9 10.23   ├ù 
+Getting requirements 
+to build wheel did 
+not run successfully.
+#9 10.23   Γöé exit 
+code: 1
+#9 10.23   Γò░ΓöÇ> 
+[33 lines of output]
+#9 10.23       
+Trying pkg-config 
+--exists mysqlclient
+#9 10.23       
+/bin/sh: 1: 
+pkg-config: not found
+#9 10.23       
+Command 'pkg-config 
+--exists 
+mysqlclient' 
+returned non-zero 
+exit status 127.
+#9 10.23       
+Trying pkg-config 
+--exists mariadb
+#9 10.23       
+/bin/sh: 1: 
+pkg-config: not found
+#9 10.23       
+Command 'pkg-config 
+--exists mariadb' 
+returned non-zero 
+exit status 127.
+#9 10.23       
+Trying pkg-config 
+--exists libmariadb
+#9 10.23       
+/bin/sh: 1: 
+pkg-config: not found
+#9 10.23       
+Command 'pkg-config 
+--exists libmariadb' 
+returned non-zero 
+exit status 127.
+#9 10.23       
+Trying pkg-config 
+--exists 
+perconaserverclient
+#9 10.23       
+/bin/sh: 1: 
+pkg-config: not found
+#9 10.23       
+Command 'pkg-config 
+--exists 
+perconaserverclient' 
+returned non-zero 
+exit status 127.
+#9 10.23       
+Traceback (most 
+recent call last):
+#9 10.23         
+File "/usr/local/lib/
+python3.11/site-packa
+ges/pip/_vendor/pypro
+ject_hooks/_in_proces
+s/_in_process.py", 
+line 389, in <module>
+#9 10.23           
+main()
+#9 10.23         
+File "/usr/local/lib/
+python3.11/site-packa
+ges/pip/_vendor/pypro
+ject_hooks/_in_proces
+s/_in_process.py", 
+line 373, in main
+#9 10.23           js
+on_out["return_val"] 
+= hook(**hook_input["
+kwargs"])
+#9 10.23             
+                     
+  ^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^
+#9 10.23         
+File "/usr/local/lib/
+python3.11/site-packa
+ges/pip/_vendor/pypro
+ject_hooks/_in_proces
+s/_in_process.py", 
+line 143, in get_requ
+ires_for_build_wheel
+#9 10.23           
+return 
+hook(config_settings)
+#9 10.23             
+     
+^^^^^^^^^^^^^^^^^^^^^
+#9 10.23         
+File "/tmp/pip-build-
+env-z_rce6gs/overlay/
+lib/python3.11/site-p
+ackages/setuptools/bu
+ild_meta.py", line 
+331, in get_requires_
+for_build_wheel
+#9 10.23           
+return self._get_buil
+d_requires(config_set
+tings, 
+requirements=[])
+#9 10.23             
+     ^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^
+#9 10.23         
+File "/tmp/pip-build-
+env-z_rce6gs/overlay/
+lib/python3.11/site-p
+ackages/setuptools/bu
+ild_meta.py", line 
+301, in 
+_get_build_requires
+#9 10.23           
+self.run_setup()
+#9 10.23         
+File "/tmp/pip-build-
+env-z_rce6gs/overlay/
+lib/python3.11/site-p
+ackages/setuptools/bu
+ild_meta.py", line 
+317, in run_setup
+#9 10.23           
+exec(code, locals())
+#9 10.23         
+File "<string>", 
+line 156, in <module>
+#9 10.23         
+File "<string>", 
+line 49, in 
+get_config_posix
+#9 10.23         
+File "<string>", 
+line 28, in 
+find_package_name
+#9 10.23       
+Exception: Can not 
+find valid 
+pkg-config name.
+#9 10.23       
+Specify 
+MYSQLCLIENT_CFLAGS 
+and 
+MYSQLCLIENT_LDFLAGS 
+env vars manually
+#9 10.23       [end 
+of output]
+#9 10.23   
+#9 10.23   note: 
+This error 
+originates from a 
+subprocess, and is 
+likely not a problem 
+with pip.
+#9 10.34 ERROR: 
+Failed to build 
+'mysqlclient' when 
+getting requirements 
+to build wheel
+#9 ERROR: process 
+"/bin/sh -c pip 
+install --upgrade 
+pip && pip install 
+--no-cache-dir -r 
+requirements.txt" 
+did not complete 
+successfully: exit 
+code: 1
+------
+ > [5/8] RUN pip 
+install --upgrade 
+pip && pip install 
+--no-cache-dir -r 
+requirements.txt:
+10.23           
+exec(code, locals())
+10.23         File 
+"<string>", line 
+156, in <module>
+10.23         File 
+"<string>", line 49, 
+in get_config_posix
+10.23         File 
+"<string>", line 28, 
+in find_package_name
+10.23       
+Exception: Can not 
+find valid 
+pkg-config name.
+10.23       Specify 
+MYSQLCLIENT_CFLAGS 
+and 
+MYSQLCLIENT_LDFLAGS 
+env vars manually
+10.23       [end of 
+output]
+10.23   
+10.23   note: This 
+error originates 
+from a subprocess, 
+and is likely not a 
+problem with pip.
+10.34 ERROR: Failed 
+to build 
+'mysqlclient' when 
+getting requirements 
+to build wheel
+------
+
+ [33m2 warnings 
+found (use docker 
+--debug to expand):
+[0m - LegacyKeyValue
+Format: "ENV 
+key=value" should be 
+used instead of 
+legacy "ENV key 
+value" format (line 
+5)
+ - LegacyKeyValueForm
+at: "ENV key=value" 
+should be used 
+instead of legacy 
+"ENV key value" 
+format (line 6)
+Dockerfile:19
+--------------------
+  17 |     # Install 
+python dependencies
+  18 |     COPY 
+requirements.txt 
+/app/
+  19 | >>> RUN pip 
+install --upgrade 
+pip && pip install 
+--no-cache-dir -r 
+requirements.txt
+  20 |     
+  21 |     # Copy 
+project
+--------------------
+ERROR: failed to 
+build: failed to 
+solve: process 
+"/bin/sh -c pip 
+install --upgrade 
+pip && pip install 
+--no-cache-dir -r 
+requirements.txt" 
+did not complete 
+successfully: exit 
+code: 1
+
+View build details: d
+ocker-desktop://dashb
+oard/build/desktop-li
+nux/desktop-linux/oun
+8mpv4wexedz4jtyfl2fnx
+d

@@ -1,0 +1,49 @@
+@startuml
+title Team Joining Process (teams_frontend_list)
+
+start
+
+:User clicks "Join Team" (POST request);
+
+if (Is User Authenticated?) then (no)
+    :Flash Error: "Login required";
+    :Redirect to Login Page;
+    stop
+else (yes)
+endif
+
+:Retrieve Target Team (team_id);
+
+if (Is User already in ANY Team?) then (yes)
+    :Flash Error: "You are already in a team";
+    :Redirect to Teams List;
+    stop
+else (no)
+endif
+
+if (Is User already a member of THIS Team?) then (yes)
+    :Flash Info: "You are already in this team";
+    :Redirect to Teams List;
+    stop
+else (no)
+endif
+
+if (Is Team Full? (>= 6 members)) then (yes)
+    :Flash Error: "Team is full";
+    :Redirect to Teams List;
+    stop
+else (no)
+endif
+
+:Create new TeamMember record;
+note right
+    Role: member
+    Status: accepted
+end note
+
+:Flash Success: "Joined team successfully";
+:Redirect to Teams List;
+
+stop
+
+@enduml

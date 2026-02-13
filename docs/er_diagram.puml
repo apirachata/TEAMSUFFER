@@ -1,0 +1,131 @@
+@startuml
+skinparam linetype ortho
+
+entity "User (auth_user)" as user {
+  *id : integer <<generated>>
+  --
+  username : varchar
+  email : varchar
+  password : varchar
+  is_staff : boolean
+  is_superuser : boolean
+}
+
+entity "UserProfile" as profile {
+  *id : integer <<generated>>
+  --
+  *user_id : integer <<FK>>
+  role : varchar
+  display_name : varchar
+  phone : varchar
+  avatar : varchar
+}
+
+entity "Game" as game {
+  *id : integer <<generated>>
+  --
+  name : varchar
+  image : varchar
+}
+
+entity "Team" as team {
+  *id : integer <<generated>>
+  --
+  name : varchar
+  description : text
+  logo : varchar
+  join_code : varchar
+  *created_by_id : integer <<FK>>
+  *game_id : integer <<FK>>
+  status : varchar
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "TeamMember" as member {
+  *id : integer <<generated>>
+  --
+  *team_id : integer <<FK>>
+  *user_id : integer <<FK>>
+  role_in_team : varchar
+  status : varchar
+  joined_at : datetime
+  left_at : datetime
+}
+
+entity "Tournament" as tournament {
+  *id : integer <<generated>>
+  --
+  name : varchar
+  description : text
+  rules : text
+  start_date : datetime
+  end_date : datetime
+  max_teams : integer
+  prize_pool : varchar
+  status : varchar
+  bracket_type : varchar
+  *game_id : integer <<FK>>
+  *created_by_id : integer <<FK>>
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "TournamentRegistration" as reg {
+  *id : integer <<generated>>
+  --
+  *tournament_id : integer <<FK>>
+  *team_id : integer <<FK>>
+  status : varchar
+  registered_at : datetime
+  approved_by_id : integer <<FK>>
+  approved_at : datetime
+  manual_score : integer
+}
+
+entity "Match" as match {
+  *id : integer <<generated>>
+  --
+  *tournament_id : integer <<FK>>
+  *team1_id : integer <<FK>>
+  *team2_id : integer <<FK>>
+  round_no : integer
+  match_no : integer
+  status : varchar
+  scheduled_at : datetime
+}
+
+entity "MatchResult" as result {
+  *id : integer <<generated>>
+  --
+  *match_id : integer <<FK>>
+  *winner_team_id : integer <<FK>>
+  team1_score : integer
+  team2_score : integer
+  *reported_by_id : integer <<FK>>
+  reported_at : datetime
+  verified_by_id : integer <<FK>>
+}
+
+' Relationships
+user ||..|| profile : has (1:1)
+user ||..o{ team : creates
+user ||..o{ member : joins
+team ||..o{ member : has
+
+game ||..o{ team : has interest
+game ||..o{ tournament : used in
+
+user ||..o{ tournament : creates
+tournament ||..o{ reg : contains
+team ||..o{ reg : registers
+
+tournament ||..o{ match : has
+team ||..o{ match : competes in (team1)
+team ||..o{ match : competes in (team2)
+
+match ||..|| result : has (1:1)
+team ||..o{ result : wins
+user ||..o{ result : reports
+
+@enduml

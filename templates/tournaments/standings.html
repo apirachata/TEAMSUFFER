@@ -114,27 +114,37 @@
                                         </td>
                                         {% if is_admin %}
                                         <td class="py-3 text-center" style="border-bottom: 1px solid #2d2d3d;">
-                                            <input type="number" name="played_{{ row.reg_id }}" value="{{ row.played }}"
+                                            <input type="number" name="played_{{ row.reg_id }}"
+                                                value="{% if row.is_manual %}{{ row.played }}{% endif %}"
+                                                placeholder="{{ row.played }}"
                                                 class="form-control form-control-sm text-center bg-dark text-white border-secondary"
                                                 style="width: 70px; margin: 0 auto;">
                                         </td>
                                         <td class="py-3 text-center" style="border-bottom: 1px solid #2d2d3d;">
-                                            <input type="number" name="won_{{ row.reg_id }}" value="{{ row.won }}"
+                                            <input type="number" name="won_{{ row.reg_id }}"
+                                                value="{% if row.is_manual %}{{ row.won }}{% endif %}"
+                                                placeholder="{{ row.won }}"
                                                 class="form-control form-control-sm text-center bg-dark text-white border-secondary"
                                                 style="width: 70px; margin: 0 auto;">
                                         </td>
                                         <td class="py-3 text-center" style="border-bottom: 1px solid #2d2d3d;">
-                                            <input type="number" name="lost_{{ row.reg_id }}" value="{{ row.lost }}"
+                                            <input type="number" name="lost_{{ row.reg_id }}"
+                                                value="{% if row.is_manual %}{{ row.lost }}{% endif %}"
+                                                placeholder="{{ row.lost }}"
                                                 class="form-control form-control-sm text-center bg-dark text-white border-secondary"
                                                 style="width: 70px; margin: 0 auto;">
                                         </td>
                                         <td class="py-3 text-center" style="border-bottom: 1px solid #2d2d3d;">
-                                            <input type="number" name="score_{{ row.reg_id }}" value="{{ row.score }}"
+                                            <input type="number" name="score_{{ row.reg_id }}"
+                                                value="{% if row.is_manual %}{{ row.score }}{% endif %}"
+                                                placeholder="{{ row.score }}"
                                                 class="form-control form-control-sm text-center bg-dark text-white border-secondary"
                                                 style="width: 70px; margin: 0 auto;">
                                         </td>
                                         <td class="py-3 text-center" style="border-bottom: 1px solid #2d2d3d;">
-                                            <input type="number" name="points_{{ row.reg_id }}" value="{{ row.points }}"
+                                            <input type="number" name="points_{{ row.reg_id }}"
+                                                value="{% if row.is_manual %}{{ row.points }}{% endif %}"
+                                                placeholder="{{ row.points }}"
                                                 class="form-control form-control-sm text-center bg-dark text-warning border-warning"
                                                 style="width: 70px; margin: 0 auto;">
                                         </td>
@@ -199,4 +209,11 @@
         background: linear-gradient(90deg, rgba(255, 215, 0, 0.05) 0%, rgba(35, 35, 50, 0) 100%);
     }
 </style>
+
+<script>
+    // Auto-refresh every 15 seconds for real-time updates
+    setInterval(function () {
+        location.reload();
+    }, 15000);
+</script>
 {% endblock %}

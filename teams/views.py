@@ -38,7 +38,7 @@ class TeamMemberRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIVi
 
 @login_required
 def teams_frontend_list(request):
-    """Frontend: list teams and allow joining by code (login required)."""
+    """Frontend: list teams and allow joining directly (login required)."""
     teams = Team.objects.filter(status='active').annotate(member_count=Count('members')).order_by('-created_at')
 
     if request.method == 'POST':
@@ -47,19 +47,24 @@ def teams_frontend_list(request):
             return redirect('account_login')
 
         team_id = request.POST.get('team_id')
-        code = request.POST.get('join_code', '').strip()
-
         team = get_object_or_404(Team, pk=team_id)
 
-        # prevent duplicate membership
+        # Check if user is already in ANY team
+        existing_membership = TeamMember.objects.filter(user=request.user).first()
+        if existing_membership:
+            messages.error(request, f'คุณอยู่ในทีม "{existing_membership.team.name}" อยู่แล้ว ไม่สามารถเข้าร่วมทีมอื่นได้')
+            return redirect('teams_frontend')
+
+        # prevent duplicate membership in same team
         if TeamMember.objects.filter(team=team, user=request.user).exists():
             messages.info(request, 'คุณเป็นสมาชิกทีมนี้อยู่แล้ว')
             return redirect('teams_frontend')
 
-        if team.join_code:
-            if not code or code != team.join_code:
-                messages.error(request, 'รหัสทีมไม่ถูกต้อง')
-                return redirect('teams_frontend')
+        # Check if team is full
+        member_count = TeamMember.objects.filter(team=team).count()
+        if member_count >= 6:
+            messages.error(request, 'ทีมนี้เต็มแล้ว')
+            return redirect('teams_frontend')
 
         TeamMember.objects.create(team=team, user=request.user, role_in_team='member', status='accepted')
         messages.success(request, f'คุณเข้าร่วมทีม {team.name} เรียบร้อยแล้ว')
@@ -67,8 +72,20 @@ def teams_frontend_list(request):
 
     # distinct games for filter
     games = Game.objects.filter(teams__in=teams).distinct()
+    
+    # Get tournaments for filter
+    from tournaments.models import Tournament, TournamentRegistration
+    tournaments = Tournament.objects.filter(status__in=['open', 'ongoing']).order_by('-start_date')
+    
+    # Add tournament info to each team
+    team_tournament_map = {}
+    for reg in TournamentRegistration.objects.select_related('team', 'tournament').filter(team__in=teams):
+        team_tournament_map[reg.team_id] = reg.tournament.name
+    
+    for team in teams:
+        team.tournament_name = team_tournament_map.get(team.id, '')
 
-    return render(request, 'teams/list.html', {'teams': teams, 'games': games})
+    return render(request, 'teams/list.html', {'teams': teams, 'games': games, 'tournaments': tournaments})
 
 
 @login_required
@@ -109,3 +126,101 @@ def delete_team_view(request, pk):
     team.delete() # Hard delete
     messages.success(request, f'ลบทีม {team_name} เรียบร้อยแล้ว')
     return redirect('teams_frontend')
+
+
+@login_required
+def approve_team_view(request, pk):
+    """Admin only: Approve a team's tournament registration."""
+    from tournaments.models import TournamentRegistration
+    from django.utils import timezone
+    
+    if not request.user.is_superuser:
+        messages.error(request, 'คุณไม่มีสิทธิ์ในการอนุมัติทีม')
+        return redirect('teams_frontend')
+
+    # Find the team's pending registration
+    team = get_object_or_404(Team, pk=pk)
+    registration = TournamentRegistration.objects.filter(team=team, status='pending').first()
+    
+    if registration:
+        registration.status = 'approved'
+        registration.approved_by = request.user
+        registration.approved_at = timezone.now()
+        registration.save()
+        messages.success(request, f'อนุมัติทีม {team.name} เรียบร้อยแล้ว')
+    else:
+        messages.info(request, f'ไม่พบการลงทะเบียนที่รอการอนุมัติสำหรับทีม {team.name}')
+    
+    return redirect('teams_frontend')
+
+
+@login_required
+def reject_team_view(request, pk):
+    """Admin only: Reject a team's tournament registration."""
+    from tournaments.models import TournamentRegistration
+    
+    if not request.user.is_superuser:
+        messages.error(request, 'คุณไม่มีสิทธิ์ในการปฏิเสธทีม')
+        return redirect('teams_frontend')
+
+    team = get_object_or_404(Team, pk=pk)
+    registration = TournamentRegistration.objects.filter(team=team, status='pending').first()
+    
+    if registration:
+        registration.status = 'rejected'
+        registration.save()
+        messages.success(request, f'ปฏิเสธทีม {team.name} เรียบร้อยแล้ว')
+    else:
+        messages.info(request, f'ไม่พบการลงทะเบียนที่รอการอนุมัติสำหรับทีม {team.name}')
+    
+    return redirect('teams_frontend')
+
+
+@login_required
+def upload_team_logo_view(request, pk):
+    """Team leader: Upload team logo."""
+    team = get_object_or_404(Team, pk=pk)
+    
+    # Check if request.user is the team creator
+    if team.created_by != request.user:
+        messages.error(request, 'คุณไม่ใช่หัวหน้าทีมนี้')
+        return redirect('account_profile')
+    
+    if request.method == 'POST' and request.FILES.get('team_logo'):
+        team.logo = request.FILES['team_logo']
+        team.save()
+        messages.success(request, f'อัปโหลดโลโก้ทีม {team.name} เรียบร้อยแล้ว')
+    else:
+        messages.error(request, 'กรุณาเลือกไฟล์รูปภาพ')
+    
+    return redirect('account_profile')
+
+
+@login_required
+def team_detail_view(request, pk):
+    """Frontend: Detail view for a specific team."""
+    team = get_object_or_404(Team, pk=pk)
+    
+    # Check if current user is a member
+    is_member = team.members.filter(user=request.user).exists()
+    
+    # Calculate empty slots for rendering placeholders
+    current_count = team.members.count()
+    empty_slots = max(0, 6 - current_count)
+    empty_slots_range = range(empty_slots) 
+
+    # Get active tournament registration
+    from tournaments.models import TournamentRegistration
+    registration = TournamentRegistration.objects.select_related('tournament').filter(
+        team=team, 
+        tournament__status__in=['open', 'ongoing']
+    ).first()
+    
+    current_tournament = registration.tournament if registration else None
+
+    return render(request, 'teams/detail.html', {
+        'team': team,
+        'is_member': is_member,
+        'empty_slots_range': empty_slots_range,
+        'current_tournament': current_tournament
+    })

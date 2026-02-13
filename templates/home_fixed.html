@@ -10,6 +10,18 @@
         <div class="header-content">
             <h1>ยินดีต้อนรับนักสู้อีสปอร์ต</h1>
             <p>ค้นหาและสร้างทัวร์นาเมนต์กีฬาอิเล็กทรอนิกส์ของคุณ</p>
+            <div style="margin-top: 20px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                <a href="{% url 'random_team_generator' %}" class="btn btn-primary"
+                    style="display:inline-block; width:auto; background: linear-gradient(90deg, #4cc9f0, #4361ee); border:none;">
+                    <i class="fas fa-random me-2"></i> Random Team Generator
+                </a>
+                {% if can_create_tournament %}
+                <a href="{% url 'create_tournament' %}" class="btn btn-primary"
+                    style="display:inline-block; width:auto; background: linear-gradient(90deg, #ff6b35, #ff9f5a); border:none;">
+                    <i class="fas fa-plus me-2"></i> สร้างการแข่งขัน
+                </a>
+                {% endif %}
+            </div>
         </div>
     </div>
 
@@ -26,10 +38,9 @@
                 <select name="game_id" onchange="this.form.submit()">
                     <option value="">ทุกเกม</option>
                     {% for g in games %}
-                    <option value="{{ g.id }}" {% if selected_game_id == g.id %}selected{% endif %}>{{ g.name }}</option>
+                    <option value="{{ g.id }}" {% if selected_game_id==g.id %}selected{% endif %}>{{ g.name }}</option>
                     {% endfor %}
                 </select>
-
                 <a href="{% url 'home' %}" class="btn"
                     style="background:#555; color:white; width:auto; text-decoration:none; padding:12px 15px;">ล้างค่า</a>
             </div>
@@ -85,7 +96,8 @@
                     <h3 class="tournament-name">{{ tournament.name }}</h3>
                     <p class="game-title">
                         <i class="fas fa-gamepad"></i>
-                        {% if tournament.game %}{{ tournament.game.name }}{% else %}{{ tournament.game_title }}{% endif %}
+                        {% if tournament.game %}{{ tournament.game.name }}{% else %}{{ tournament.game_title }}{% endif
+                        %}
                     </p>
                     {% if tournament.prize_pool %}
                     <div class="prize-info">
@@ -100,7 +112,10 @@
                         </span>
                         <span class="meta-item">
                             <i class="fas fa-users"></i>
-                            <span id="teams-{{ tournament.id }}">{{ tournament.registrations.count }}</span>/{{ tournament.max_teams|default:"-" }}
+                            <span id="teams-{{ tournament.id }}">{{ tournament.registrations.count }}</span>/{{
+                            tournament.max_teams|default:"-" }}
+                        </span>
+
                     </div>
                 </div>
                 <div class="card-action">

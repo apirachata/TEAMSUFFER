@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ team.name }} - TEAMSUFFER{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 1000px; margin: 40px auto; padding: 20px;">
+    <!-- Back Button -->
+    <a href="{% url 'teams_frontend' %}"
+        style="display:inline-flex;align-items:center;color:#b0b8c8;text-decoration:none;margin-bottom:20px;font-size:0.95rem;transition:color 0.3s">
+        <i class="fas fa-arrow-left" style="margin-right:8px;"></i> กลับไปหน้ารายชื่อทีม
+    </a>
+
+    <!-- Team Header Card -->
+    <div
+        style="background: linear-gradient(135deg, #1f2340 0%, #352147 100%); border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.3); margin-bottom: 30px;">
+        <div style="padding: 40px; text-align: center; position: relative;">
+
+            {% if team.logo %}
+            <div
+                style="width: 120px; height: 120px; margin: 0 auto 20px; border-radius: 50%; overflow: hidden; border: 4px solid rgba(255,255,255,0.1); background: #1a1f3a;">
+                <img src="{{ team.logo.url }}" alt="{{ team.name }}"
+                    style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            {% else %}
+            <div
+                style="width: 120px; height: 120px; margin: 0 auto 20px; border-radius: 50%; background: linear-gradient(45deg, #ff6b35, #ff9f5a); display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: bold; color: white;">
+                {{ team.name|slice:":1"|upper }}
+            </div>
+            {% endif %}
+
+            <h1 style="color: white; margin-bottom: 10px; font-size: 2.5rem;">{{ team.name }}</h1>
+
+            {% if team.game %}
+            <div
+                style="display: inline-flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.2); padding: 8px 16px; border-radius: 20px; color: #b0b8c8; margin-bottom: 20px;">
+                <i class="fas fa-gamepad" style="color: #ff6b35;"></i>
+                <span>{{ team.game.name }}</span>
+            </div>
+            {% endif %}
+
+            <div
+                style="display: flex; justify-content: center; gap: 40px; margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
+                <div>
+                    <div style="font-size: 0.9rem; color: #b0b8c8; margin-bottom: 5px;">สมาชิก</div>
+                    <div style="font-size: 1.5rem; font-weight: bold; color: white;">{{ team.members.count }} / 6</div>
+                </div>
+                <div>
+                    <div style="font-size: 0.9rem; color: #b0b8c8; margin-bottom: 5px;">วันที่สร้าง</div>
+                    <div style="font-size: 1.5rem; font-weight: bold; color: white;">{{ team.created_at|date:"d M Y" }}
+                    </div>
+                </div>
+                <div>
+                    <div style="font-size: 0.9rem; color: #b0b8c8; margin-bottom: 5px;">สถานะ</div>
+                    <div
+                        style="font-size: 1.5rem; font-weight: bold; color: {% if team.members.count < 6 %}#4caf50{% else %}#f44336{% endif %};">
+                        {% if team.members.count < 6 %}เปิดรับ{% else %}เต็ม{% endif %} </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons for Non-Members -->
+                {% if request.user.is_authenticated %}
+                {% if not is_member and team.members.count < 6 %} <form method="post"
+                    action="{% url 'teams_frontend' %}" style="margin-top: 30px;">
+                    {% csrf_token %}
+                    <input type="hidden" name="team_id" value="{{ team.id }}">
+                    <button type="submit" class="btn"
+                        style="background: #ff6b35; color: white; border: none; padding: 12px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 1.1rem; transition: all 0.3s;">
+                        <i class="fas fa-plus-circle me-2"></i> ขอเข้าร่วมทีม
+                    </button>
+                    </form>
+                    {% elif is_member %}
+                    <div style="margin-top: 30px; color: #4caf50; font-weight: bold;">
+                        <i class="fas fa-check-circle me-2"></i> คุณเป็นสมาชิกทีมนี้แล้ว
+                    </div>
+                    {% endif %}
+                    {% endif %}
+            </div>
+        </div>
+
+        <!-- Members Section -->
+        <h2 style="color: white; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+            <i class="fas fa-users" style="color: #ff6b35;"></i> สมาชิกในทีม
+        </h2>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+            {% for member in team.members.all %}
+            <div
+                style="background: #1a1f3a; border: 1px solid #2a3150; border-radius: 12px; padding: 20px; display: flex; align-items: center; gap: 15px; transition: transform 0.3s;">
+                <div
+                    style="width: 50px; height: 50px; background: #2a3150; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #b0b8c8; font-weight: bold; font-size: 1.2rem;">
+                    {{ member.user.username|slice:":1"|upper }}
+                </div>
+                <div style="flex: 1;">
+                    <div style="color: white; font-weight: bold; font-size: 1.1rem;">{{ member.user.username }}</div>
+                    <div
+                        style="color: {% if member.role_in_team == 'leader' %}#ffd700{% else %}#b0b8c8{% endif %}; font-size: 0.9rem;">
+                        {% if member.role_in_team == 'leader' %}
+                        <i class="fas fa-crown me-1"></i> หัวหน้าทีม
+                        {% else %}
+                        สมาชิก
+                        {% endif %}
+                    </div>
+                </div>
+                {% if request.user == team.created_by and member.user != request.user %}
+                <!-- Leader can kick members -->
+                <a href="{% url 'remove_team_member' member.id %}"
+                    onclick="return confirm('ต้องการลบสมาชิก {{ member.user.username }} ออกจากทีม?')"
+                    style="color: #f44336; padding: 8px; border-radius: 50%; transition: background 0.3s;"
+                    title="ลบออกจากทีม">
+                    <i class="fas fa-times"></i>
+                </a>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <!-- Empty Slots -->
+            {% if team.members.count < 6 %} {% for i in empty_slots_range %} <div
+                style="border: 2px dashed #2a3150; border-radius: 12px; padding: 20px; display: flex; align-items: center; justify-content: center; min-height: 90px;">
+                <span style="color: #2a3150; font-weight: bold;">ว่าง</span>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Tournament History (Optional - if we have relations) -->
+    <!-- Assuming we can access registrations -->
+</div>
+{% endblock %}

@@ -1,0 +1,127 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class User {
+    +username: String
+    +email: String
+    +password: String
+    +is_staff: Boolean
+    +is_superuser: Boolean
+}
+
+class UserProfile {
+    +user: User
+    +role: String {player, team_leader, tournament_admin}
+    +display_name: String
+    +phone: String
+    +avatar: ImageField
+}
+
+class Team {
+    +name: String
+    +description: Text
+    +logo: ImageField
+    +logo_url: URL
+    +join_code: String
+    +created_by: User
+    +status: String {active, disbanded, pending}
+    +game: Game
+    +created_at: DateTime
+    +updated_at: DateTime
+}
+
+class TeamMember {
+    +team: Team
+    +user: User
+    +role_in_team: String {leader, member}
+    +status: String {pending, accepted, rejected}
+    +joined_at: DateTime
+    +left_at: DateTime
+}
+
+class Game {
+    +name: String
+    +image: ImageField
+}
+
+class Tournament {
+    +name: String
+    +game: Game
+    +game_title: String
+    +description: Text
+    +rules: Text
+    +start_date: DateTime
+    +end_date: DateTime
+    +max_teams: Integer
+    +prize_pool: String
+    +is_featured: Boolean
+    +featured_image: ImageField
+    +featured_description: Text
+    +status: String {draft, open, closed, ongoing, finished}
+    +created_by: User
+    +created_at: DateTime
+    +updated_at: DateTime
+    +bracket: JSONField
+    +bracket_type: String
+    +point_win: Integer
+    +point_draw: Integer
+    +point_loss: Integer
+}
+
+class TournamentRegistration {
+    +tournament: Tournament
+    +team: Team
+    +status: String {pending, approved, rejected, cancelled}
+    +registered_at: DateTime
+    +approved_by: User
+    +approved_at: DateTime
+    +manual_played: Integer
+    +manual_won: Integer
+    +manual_lost: Integer
+    +manual_points: Integer
+    +manual_score: Integer
+}
+
+class Match {
+    +tournament: Tournament
+    +round_no: Integer
+    +match_no: Integer
+    +team1: Team
+    +team2: Team
+    +scheduled_at: DateTime
+    +status: String {scheduled, finished}
+}
+
+class MatchResult {
+    +match: Match
+    +winner_team: Team
+    +team1_score: Integer
+    +team2_score: Integer
+    +reported_by: User
+    +reported_at: DateTime
+    +verified_by: User
+    +verified_at: DateTime
+}
+
+' Relationships
+User "1" -- "1" UserProfile : has
+User "1" -- "*" Team : creates >
+User "1" -- "*" TeamMember : joins >
+Team "1" -- "*" TeamMember : has >
+User "1" -- "*" Tournament : creates >
+
+Game "1" -- "*" Tournament : includes >
+Game "1" -- "*" Team : interest >
+
+Tournament "1" -- "*" TournamentRegistration : contains >
+Team "1" -- "*" TournamentRegistration : registers for >
+
+Tournament "1" -- "*" Match : organizes >
+Team "1" -- "*" Match : competes in >
+Team "1" -- "*" Match : competes in >
+
+Match "1" -- "0..1" MatchResult : has >
+MatchResult -- Team : declares winner >
+MatchResult -- User : reported by >
+
+@enduml

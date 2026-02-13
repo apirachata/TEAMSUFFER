@@ -1,0 +1,61 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Guest (ผู้เยี่ยมชม)" as g
+actor "Player (ผู้เล่น)" as p
+actor "Team Leader (หัวหน้าทีม)" as tl
+actor "Admin (ผู้ดูแลระบบ)" as a
+
+p -|> g
+tl -|> p
+a -|> p
+
+package "การจัดการผู้ใช้ (User Management)" {
+    usecase "สมัครสมาชิก (Register)" as UC1
+    usecase "เข้าสู่ระบบ (Login)" as UC2
+    usecase "ดูโปรไฟล์ (View Profile)" as UC3
+    usecase "ออกจากระบบ (Logout)" as UC4
+}
+
+package "การจัดการทีม (Team Management)" {
+    usecase "สร้างทีม (Create Team)" as UC5
+    usecase "เข้าร่วมทีม (Join Team)" as UC6
+    usecase "ดูรายชื่อทีม (View Teams)" as UC7
+    usecase "ลบทีม (Delete Team)" as UC8
+}
+
+package "การจัดการการแข่งขัน (Tournament Management)" {
+    usecase "ดูรายการแข่งขัน (View Tournament List)" as UC9
+    usecase "ดูรายละเอียดการแข่งขัน (View Tournament Details)" as UC10
+    usecase "ดูตารางแข่ง/คะแนน (View Bracket/Standings)" as UC11
+    usecase "สมัครแข่ง (Register Team for Tournament)" as UC12
+    usecase "สร้างการแข่งขัน (Create Tournament)" as UC13
+    usecase "เริ่มการแข่งขัน/จัดตาราง (Start Tournament)" as UC14
+    usecase "บันทึกผลการแข่งขัน (Update Scores)" as UC15
+    usecase "แก้ไขคะแนน (Manual Override)" as UC16
+    usecase "สลับทีม (Swap Teams)" as UC17
+}
+
+g --> UC1
+g --> UC2
+g --> UC7
+g --> UC9
+g --> UC10
+g --> UC11
+
+p --> UC3
+p --> UC4
+p --> UC5
+p --> UC6
+p --> UC12
+
+tl --> UC8
+
+a --> UC13
+a --> UC14
+a --> UC15
+a --> UC16
+a --> UC17
+
+@enduml
