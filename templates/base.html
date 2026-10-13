@@ -13,10 +13,13 @@
 <body>
     <nav class="navbar">
         <div class="navbar-container">
-            <div class="navbar-logo">
+            <a href="{% url 'home' %}" class="navbar-logo">
                 <i class="fas fa-trophy"></i> TEAMSUFFER
-            </div>
-            <ul class="navbar-menu">
+            </a>
+            <button class="navbar-toggle" id="navbarToggle" aria-label="เปิด/ปิดเมนู" type="button">
+                <i class="fas fa-bars"></i>
+            </button>
+            <ul class="navbar-menu" id="navbarMenu">
                 <li><a href="{% url 'home' %}" class="nav-link">หน้าหลัก</a></li>
                 <li><a href="{% url 'teams_frontend' %}" class="nav-link">ทีม</a></li>
                 <li><a href="{% url 'tournament_list' %}" class="nav-link">สายการแข่งขัน</a></li>
@@ -58,6 +61,19 @@
     </div>
 
     <style>
+        @media (max-width: 768px) {
+            #toast-container {
+                top: 15px !important;
+                right: 15px !important;
+                left: 15px !important;
+                width: auto !important;
+            }
+            .toast-notification {
+                padding: 12px 16px !important;
+                font-size: 0.9rem !important;
+            }
+        }
+
         @keyframes slideIn {
             from {
                 transform: translateX(100%);
@@ -84,8 +100,53 @@
     </style>
 
     <script>
-        // Auto-dismiss toasts after 5 seconds
+        // Mobile Navbar Toggle
         document.addEventListener('DOMContentLoaded', function() {
+            const toggleBtn = document.getElementById('navbarToggle');
+            const navMenu = document.getElementById('navbarMenu');
+            
+            if (toggleBtn && navMenu) {
+                toggleBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    navMenu.classList.toggle('active');
+                    const icon = toggleBtn.querySelector('i');
+                    if (icon) {
+                        if (navMenu.classList.contains('active')) {
+                            icon.classList.remove('fa-bars');
+                            icon.classList.add('fa-times');
+                        } else {
+                            icon.classList.remove('fa-times');
+                            icon.classList.add('fa-bars');
+                        }
+                    }
+                });
+
+                // Close menu when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!navMenu.contains(e.target) && !toggleBtn.contains(e.target)) {
+                        navMenu.classList.remove('active');
+                        const icon = toggleBtn.querySelector('i');
+                        if (icon) {
+                            icon.classList.remove('fa-times');
+                            icon.classList.add('fa-bars');
+                        }
+                    }
+                });
+
+                // Close menu when clicking any nav link
+                navMenu.querySelectorAll('.nav-link').forEach(function(link) {
+                    link.addEventListener('click', function() {
+                        navMenu.classList.remove('active');
+                        const icon = toggleBtn.querySelector('i');
+                        if (icon) {
+                            icon.classList.remove('fa-times');
+                            icon.classList.add('fa-bars');
+                        }
+                    });
+                });
+            }
+
+            // Auto-dismiss toasts after 5 seconds
             const toasts = document.querySelectorAll('.toast-notification');
             toasts.forEach(function(toast) {
                 setTimeout(function() {
