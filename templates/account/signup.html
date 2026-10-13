@@ -298,7 +298,7 @@
 
     <div class="signup-right">
         <div class="signup-form-container">
-            <h1 class="signup-form-title">Sign Up</h1>
+            <h1 class="signup-form-title">สมัครสมาชิก</h1>
 
             {% if redirect_field_value %}
                 <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
@@ -338,32 +338,14 @@
                 {% endif %}
 
                 <p class="terms-text">
-                    By signing up, you agree to our Terms of Service and Privacy Policy
+                    การสมัครสมาชิกถือว่าคุณยอมรับเงื่อนไขการใช้งานและนโยบายความเป็นส่วนตัว
                 </p>
 
-                <button type="submit" class="signup-button">Create Account</button>
+                <button type="submit" class="signup-button">สร้างบัญชี</button>
 
-                {% social_apps as social_providers %}
-                {% if social_providers %}
-                    <div class="divider">or</div>
-                    <div class="social-buttons">
-                        {% for provider in social_providers %}
-                            <a href="{% provider_login_url provider.provider %}" class="social-btn {% if provider.provider == 'google' %}google{% endif %}">
-                                <span class="social-icon">
-                                    {% if provider.provider == 'google' %}
-                                        G
-                                    {% else %}
-                                        {{ provider.provider|slice:":1"|upper }}
-                                    {% endif %}
-                                </span>
-                                <span>Sign up with {{ provider.get_provider_display }}</span>
-                            </a>
-                        {% endfor %}
-                    </div>
-                {% endif %}
 
                 <div class="login-link">
-                    Already have an account? <a href="{% url 'account_login' %}">Sign in here</a>
+                    มีบัญชีอยู่แล้ว? <a href="{% url 'account_login' %}">เข้าสู่ระบบที่นี่</a>
                 </div>
             </form>
         </div>

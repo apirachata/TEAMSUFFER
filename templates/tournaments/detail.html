@@ -6,8 +6,7 @@
 {% block content %}
 <div style="max-width:900px;margin:40px auto;padding:24px;background:rgba(15,18,35,0.85);border-radius:12px;color:#fff">
   <h2 style="margin-bottom:6px">{{ tournament.name }}</h2>
-  <p style="color:#9fb6ff;margin-bottom:18px">{{ tournament.game.name }} • วันที่แข่งขัน: {{
-    tournament.start_date|date:'j F Y' }}</p>
+  <p style="color:#9fb6ff;margin-bottom:18px">{{ tournament.game.name }} • วันที่แข่งขัน: {{ tournament.start_date|date:'j F Y' }}</p>
 
   {% if tournament.featured_image %}
   <div style="margin-bottom:16px">
@@ -23,12 +22,18 @@
   <div style="color:#cfdff8;margin-bottom:22px">{{ tournament.rules|default:'ไม่มีกติกา'|linebreaksbr }}</div>
 
   <div style="text-align:right">
-    <div class="d-flex gap-2">
+    <div class="d-flex gap-2 justify-content-end flex-wrap">
       {% if user == tournament.created_by or user.is_superuser %}
       <a href="{% url 'manage_matches' tournament.pk %}" class="btn btn-warning"><i class="fas fa-edit"></i>
         จัดการผลการแข่งขัน</a>
       <a href="{% url 'tournament_start' tournament.pk %}" class="btn btn-success"><i class="fas fa-play"></i>
         เริ่มการแข่งขัน</a>
+      {% if tournament.status == 'finished' or tournament.status == 'closed' or tournament.status == 'draft' %}
+      <form action="{% url 'tournament_delete' tournament.pk %}" method="POST" style="display:inline;" onsubmit="return confirm('คุณต้องการลบการแข่งขันนี้ใช่หรือไม่? การกระทำนี้ไม่สามารถยกเลิกได้');">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> ลบการแข่งขัน</button>
+      </form>
+      {% endif %}
       {% endif %}
       <a href="{% url 'tournament_bracket' tournament.pk %}" class="btn btn-primary"><i class="fas fa-sitemap"></i>
         ตารางแข่ง</a>

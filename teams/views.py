@@ -36,9 +36,8 @@ class TeamMemberRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIVi
     permission_classes = [permissions.IsAuthenticated]
 
 
-@login_required
 def teams_frontend_list(request):
-    """Frontend: list teams and allow joining directly (login required)."""
+    """Frontend: list teams (public) and allow joining directly (login required for POST)."""
     teams = Team.objects.filter(status='active').annotate(member_count=Count('members')).order_by('-created_at')
 
     if request.method == 'POST':

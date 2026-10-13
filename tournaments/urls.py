@@ -22,11 +22,12 @@ urlpatterns = [
          name='match-result-detail'),
 
      # Frontend tournament detail + registration flows
-     path('tournaments/<int:pk>/detail/', views.tournament_detail_view, name='tournament_detail_frontend'),
+     path('tournaments/<int:pk>/detail/', views.tournament_detail_view, name='api_tournament_detail_frontend'),
+     path('tournaments/<int:pk>/delete/', views.delete_tournament_view, name='tournament_delete'),
      path('tournaments/<int:pk>/bracket/', views.tournament_bracket_view, name='tournament_bracket'),
      path('tournaments/<int:pk>/start/', views.start_tournament_view, name='tournament_start'),
      path('tournaments/<int:pk>/standings/', views.tournament_standings_view, name='tournament_standings'),
-     path('tournaments/<int:pk>/register/create-team/', views.create_team_and_register, name='tournament_create_team_register'),
+     path('tournaments/<int:pk>/register/create-team/', views.create_team_and_register, name='api_tournament_create_team_register'),
      path('tournaments/<int:pk>/join-team/', views.tournament_join_team_view, name='tournament_join_team'),
      path('tournaments/<int:pk>/manage/', views.manage_matches_view, name='manage_matches'),
      path('tournaments/<int:pk>/standings/manage/', views.manage_standings_view, name='manage_standings'),

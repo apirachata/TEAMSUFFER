@@ -35,9 +35,9 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-# Frontend tournament detail (public - no login required)
-# and registration flow (requires login)
+# Frontend tournament list (public - no login required)
 urlpatterns += [
+    path('tournaments/', tournaments_views.tournament_list_bracket_view, name='tournament_list'),
     path('tournaments/<int:pk>/detail/', tournaments_views.tournament_detail_view, name='tournament_detail'),
     path('tournaments/<int:pk>/register/create-team/', tournaments_views.create_team_and_register, name='tournament_create_team_register'),
     path('tournaments/create/', tournaments_views.create_tournament_view, name='create_tournament'),
@@ -48,3 +48,4 @@ urlpatterns += [
     path('teams/', teams_views.teams_frontend_list, name='teams_frontend'),
     path('teams/<int:pk>/delete/', teams_views.delete_team_view, name='delete_team'),
 ]
+

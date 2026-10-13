@@ -281,7 +281,7 @@
 
     <div class="signup-right">
         <div class="signup-form-container">
-            <h1 class="signup-form-title">Login</h1>
+            <h1 class="signup-form-title">เข้าสู่ระบบ</h1>
 
             {% if redirect_field_value %}
             <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
@@ -311,30 +311,11 @@
                 </div>
                 {% endif %}
 
-                <button type="submit" class="signup-button">Sign In</button>
+                <button type="submit" class="signup-button">เข้าสู่ระบบ</button>
 
-                {% get_providers as social_providers %}
-                {% if social_providers %}
-                <div class="divider">or</div>
-                <div class="social-buttons">
-                    {% for provider in social_providers %}
-                    <a href="{% provider_login_url provider.provider process='login' %}"
-                        class="social-btn {% if provider.provider == 'google' %}google{% endif %}">
-                        <span class="social-icon">
-                            {% if provider.provider == 'google' %}
-                            G
-                            {% else %}
-                            {{ provider.provider|slice:":1"|upper }}
-                            {% endif %}
-                        </span>
-                        <span>Sign in with {{ provider.name }}</span>
-                    </a>
-                    {% endfor %}
-                </div>
-                {% endif %}
 
                 <div class="login-link">
-                    Don't have an account? <a href="{% url 'account_signup' %}">Sign up here</a>
+                    ยังไม่มีบัญชี? <a href="{% url 'account_signup' %}">สมัครสมาชิกที่นี่</a>
                 </div>
             </form>
         </div>

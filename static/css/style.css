@@ -189,6 +189,48 @@ body {
     border-color: var(--primary-color);
 }
 
+/* Global Form Element Styles - Dark Theme */
+select,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+input[type="url"],
+textarea {
+    background: var(--card-bg, #1a1f3a) !important;
+    color: var(--text-primary, #ffffff) !important;
+    border: 1px solid #4a5578 !important; /* Make border more visible */
+    border-radius: 6px;
+    padding: 12px 15px;
+}
+
+/* 
+  Fix for Windows/Chrome where option backgrounds are forced to white.
+  If we use white text, it becomes invisible. 
+  So we force dark text on a light background for options to ensure readability. 
+*/
+select option {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    padding: 10px;
+}
+
+select option:hover,
+select option:checked,
+select option:focus {
+    background-color: #f0f0f0 !important;
+    color: var(--primary-color, #ff6b35) !important;
+}
+
+select:focus,
+input:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--primary-color, #ff6b35) !important;
+    box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.25);
+}
+
 /* Section Title */
 .section-title {
     font-size: 1.8rem;

@@ -56,18 +56,20 @@
           <td style="padding:12px">
             {% if request.user.is_superuser %}
             <!-- Admin sees approve/reject/delete buttons -->
-            <a href="{% url 'approve_team' team.id %}" onclick="return confirm('อนุมัติทีม {{ team.name }}?');"
-              style="padding:6px 12px;background:#28a745;color:white;text-decoration:none;border-radius:6px;font-size:0.85rem;margin-right:6px;">
-              อนุมัติ
-            </a>
-            <a href="{% url 'reject_team' team.id %}" onclick="return confirm('ปฏิเสธทีม {{ team.name }}?');"
-              style="padding:6px 12px;background:#ffc107;color:#000;text-decoration:none;border-radius:6px;font-size:0.85rem;margin-right:6px;">
-              ปฏิเสธ
-            </a>
-            <a href="{% url 'delete_team' team.id %}" onclick="return confirm('ยืนยันลบทีม {{ team.name }}?');"
-              style="padding:6px 12px;background:#dc3545;color:white;text-decoration:none;border-radius:6px;font-size:0.85rem;">
-              ลบ
-            </a>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <a href="{% url 'approve_team' team.id %}" onclick="return confirm('อนุมัติทีม {{ team.name }}?');"
+                style="padding:6px 12px;background:#28a745;color:white;text-decoration:none;border-radius:6px;font-size:0.85rem;white-space:nowrap;">
+                อนุมัติ
+              </a>
+              <a href="{% url 'reject_team' team.id %}" onclick="return confirm('ปฏิเสธทีม {{ team.name }}?');"
+                style="padding:6px 12px;background:#ffc107;color:#000;text-decoration:none;border-radius:6px;font-size:0.85rem;white-space:nowrap;">
+                ปฏิเสธ
+              </a>
+              <a href="{% url 'delete_team' team.id %}" onclick="return confirm('ยืนยันลบทีม {{ team.name }}?');"
+                style="padding:6px 12px;background:#dc3545;color:white;text-decoration:none;border-radius:6px;font-size:0.85rem;white-space:nowrap;">
+                ลบ
+              </a>
+            </div>
             {% else %}
             <!-- Regular users see join button -->
             {% if team.member_count|default:0 < 6 %} <form method="post" style="display:inline">

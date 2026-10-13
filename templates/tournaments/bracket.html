@@ -386,8 +386,11 @@
           </div>
         </div>
         <div class="modal-footer" style="border-top: 1px solid rgba(255,255,255,0.1);">
+          <button type="submit" name="action" value="random_all" class="btn btn-warning me-auto" formnovalidate onclick="return confirm('การสุ่มทีมจะล้างข้อมูลแข่งขันเดิมและจัดสายใหม่ทั้งหมด ยืนยันหรือไม่?');">
+            <i class="fas fa-random"></i> สุ่มทีมเพื่อความเท่าเทียมกัน (Random All)
+          </button>
           <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">ยกเลิก</button>
-          <button type="submit" class="btn btn-primary">ยืนยันการสลับ</button>
+          <button type="submit" name="action" value="swap" class="btn btn-primary">ยืนยันการสลับ</button>
         </div>
       </form>
     </div>

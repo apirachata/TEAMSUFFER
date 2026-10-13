@@ -19,7 +19,7 @@
             <ul class="navbar-menu">
                 <li><a href="{% url 'home' %}" class="nav-link">หน้าหลัก</a></li>
                 <li><a href="{% url 'teams_frontend' %}" class="nav-link">ทีม</a></li>
-                <li><a href="{% url 'tournament_list_bracket' %}" class="nav-link">สายการแข่งขัน</a></li>
+                <li><a href="{% url 'tournament_list' %}" class="nav-link">สายการแข่งขัน</a></li>
                 {% if user.is_authenticated %}
                 <li><a href="{% url 'account_profile' %}" class="nav-link">โปรไฟล์</a></li>
                 <li><a href="{% url 'account_logout' %}" class="nav-link logout-btn">ออกจากระบบ</a></li>

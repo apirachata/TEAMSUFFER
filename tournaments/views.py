@@ -112,6 +112,31 @@ def tournament_detail_view(request, pk):
 
 
 @login_required
+def delete_tournament_view(request, pk):
+    """Admin view to delete a completed tournament."""
+    tournament = get_object_or_404(Tournament, pk=pk)
+    
+    # Check permission
+    is_admin = request.user.is_superuser or request.user.is_staff or request.user == tournament.created_by
+    if hasattr(request.user, 'profile'):
+        is_admin = is_admin or request.user.profile.role == 'tournament_admin'
+        
+    if not is_admin:
+        messages.error(request, 'คุณไม่มีสิทธิ์ลบการแข่งขัน')
+        return redirect('tournament_detail', pk=pk)
+        
+    if request.method == 'POST':
+        tournament_name = tournament.name
+        tournament.delete()
+        messages.success(request, f'ลบการแข่งขัน "{tournament_name}" เรียบร้อยแล้ว')
+        return redirect('home')
+        
+    # Using the detail view as a confirmation page or you can redirect
+    # Normally we do this via POST from the detail page itself.
+    return redirect('tournament_detail', pk=pk)
+
+
+@login_required
 def create_team_and_register(request, pk):
     """Show a Create Team form; on submit create the team, make the user the leader, then register for tournament."""
     tournament = get_object_or_404(Tournament, pk=pk)
@@ -199,7 +224,7 @@ def tournament_join_team_view(request, pk):
         # join: create TeamMember as accepted
         TeamMember.objects.create(team=team, user=request.user, role_in_team='member', status='accepted')
         messages.success(request, f'คุณเข้าร่วมทีม {team.name} เรียบร้อยแล้ว')
-        return redirect('tournament_detail_frontend', pk=pk)
+        return redirect('tournament_detail', pk=pk)
 
     # get unique games from these teams (to use in filter dropdown)
     # A team might not have a game assigned, so filter none if needed or handle in template
@@ -219,7 +244,7 @@ def start_tournament_view(request, pk):
     # Check permission
     if request.user != tournament.created_by and not request.user.is_superuser:
         messages.error(request, "คุณไม่มีสิทธิ์เริ่มการแข่งขันนี้")
-        return redirect('tournament_detail_frontend', pk=pk)
+        return redirect('tournament_detail', pk=pk)
         
     success, msg = generate_bracket(tournament)
     if success:
@@ -326,7 +351,7 @@ def manage_matches_view(request, pk):
     # Check permission
     if request.user != tournament.created_by and not request.user.is_superuser:
         messages.error(request, "คุณไม่มีสิทธิ์จัดการผลการแข่งขันนี้")
-        return redirect('tournament_detail_frontend', pk=pk)
+        return redirect('tournament_detail', pk=pk)
 
     matches = Match.objects.filter(tournament=tournament).order_by('round_no', 'match_no').select_related('team1', 'team2', 'result')
 
@@ -530,6 +555,17 @@ def swap_teams_view(request, pk):
         return redirect('tournament_bracket', pk=pk)
 
     if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'random_all':
+            from .services import generate_bracket
+            success, msg = generate_bracket(tournament)
+            if success:
+                messages.success(request, f"สุ่มตารางการแข่งขันใหม่เรียบร้อยแล้ว")
+            else:
+                messages.error(request, f"เกิดข้อผิดพลาดในการสุ่มสาย: {msg}")
+            return redirect('tournament_bracket', pk=pk)
+            
         team1_id = request.POST.get('team1_id')
         team2_id = request.POST.get('team2_id')
 
