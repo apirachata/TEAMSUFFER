@@ -13,9 +13,11 @@ urlpatterns = [
     path('team-members/<int:pk>/', views.TeamMemberRetrieveUpdateDestroyAPIView.as_view(), name='team-member-detail'),
     path('team-members/<int:pk>/remove/', views.remove_team_member_view, name='remove_team_member'),
     
-    # Admin actions
+    # Admin / Member actions
     path('teams/<int:pk>/delete/', views.delete_team_view, name='delete_team'),
     path('teams/<int:pk>/approve/', views.approve_team_view, name='approve_team'),
     path('teams/<int:pk>/reject/', views.reject_team_view, name='reject_team'),
     path('teams/<int:pk>/upload-logo/', views.upload_team_logo_view, name='upload_team_logo'),
+    path('teams/leave/', views.leave_team_view, name='leave_team'),
+    path('teams/<int:pk>/disband/', views.disband_team_view, name='disband_team'),
 ]

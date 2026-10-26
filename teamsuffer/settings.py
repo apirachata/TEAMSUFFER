@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 #The secret key
 SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-default-dev-key-do-not-use-in-production")
  
-DEBUG = bool(os.environ.get("DEBUG", default=True))
+DEBUG = os.environ.get("DEBUG", "True").lower() in ("true", "1", "t", "yes")
  
 ALLOWED_HOSTS = os.environ.get(
     "DJANGO_ALLOWED_HOSTS", 
@@ -34,6 +34,12 @@ CSRF_TRUSTED_ORIGINS = os.environ.get(
     "CSRF_TRUSTED_ORIGINS", 
     "http://localhost:8000,https://postencephalitic-jennefer-curlily.ngrok-free.dev"
 ).split(",")
+
+# Render.com automatic hostname support
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+    CSRF_TRUSTED_ORIGINS.append(f"https://{RENDER_EXTERNAL_HOSTNAME}")
 
 
 # Application definition

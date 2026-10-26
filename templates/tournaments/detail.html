@@ -21,13 +21,103 @@
   <h3 style="font-size:1.2rem;margin-top:16px;">กติกา (Rules)</h3>
   <div style="color:#cfdff8;margin-bottom:22px;line-height:1.6;">{{ tournament.rules|default:'ไม่มีกติกา'|linebreaksbr }}</div>
 
+  <!-- Registered Teams Section -->
+  <div style="margin-top:28px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.1);">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+      <h3 style="font-size:1.25rem;margin:0;display:flex;align-items:center;gap:8px;">
+        <i class="fas fa-users" style="color:#ffd700;"></i> ทีมที่สมัครเข้าร่วมการแข่งขัน ({{ registrations|length }}/{{ tournament.max_teams }})
+      </h3>
+      <div>
+        <span style="font-size:0.9rem;color:#28a745;font-weight:bold;margin-right:8px;">อนุมัติแล้ว: {{ approved_count }} ทีม</span>
+        {% if approved_count < 2 %}
+        <span style="font-size:0.8rem;color:#ffc107;">(ต้องมีทีมอนุมัติอย่างน้อย 2 ทีมเพื่อเริ่มการแข่งขัน)</span>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if registrations %}
+    <div style="background:rgba(0,0,0,0.25);border-radius:10px;overflow-x:auto;margin-bottom:24px;">
+      <table style="width:100%;min-width:550px;border-collapse:collapse;color:#ddd;font-size:0.9rem;">
+        <thead>
+          <tr style="text-align:left;border-bottom:1px solid rgba(255,255,255,0.1);color:#9fb6ff;">
+            <th style="padding:12px 14px;">ชื่อทีม</th>
+            <th style="padding:12px 14px;">หัวหน้าทีม</th>
+            <th style="padding:12px 14px;text-align:center;">จำนวนสมาชิก</th>
+            <th style="padding:12px 14px;text-align:center;">สถานะ</th>
+            {% if is_admin or user == tournament.created_by or user.is_superuser or user.is_staff or user.profile.role == 'tournament_admin' %}
+            <th style="padding:12px 14px;text-align:center;">จัดการ</th>
+            {% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for reg in registrations %}
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+            <td style="padding:12px 14px;font-weight:bold;color:#fff;">
+              <a href="{% url 'team_detail' reg.team.id %}" style="color:#fff;text-decoration:none;">
+                {{ reg.team.name }}
+              </a>
+            </td>
+            <td style="padding:12px 14px;color:#bbb;">
+              {{ reg.team.created_by.username }}
+            </td>
+            <td style="padding:12px 14px;text-align:center;">
+              {{ reg.team.members.count }} / 6
+            </td>
+            <td style="padding:12px 14px;text-align:center;">
+              {% if reg.status == 'approved' %}
+              <span style="display:inline-block;padding:3px 8px;border-radius:4px;background:rgba(40,167,69,0.2);color:#28a745;font-size:0.8rem;font-weight:bold;">
+                <i class="fas fa-check-circle me-1"></i> อนุมัติแล้ว
+              </span>
+              {% elif reg.status == 'pending' %}
+              <span style="display:inline-block;padding:3px 8px;border-radius:4px;background:rgba(255,193,7,0.2);color:#ffc107;font-size:0.8rem;font-weight:bold;">
+                <i class="fas fa-clock me-1"></i> รอการอนุมัติ
+              </span>
+              {% elif reg.status == 'rejected' %}
+              <span style="display:inline-block;padding:3px 8px;border-radius:4px;background:rgba(220,53,69,0.2);color:#dc3545;font-size:0.8rem;font-weight:bold;">
+                <i class="fas fa-times-circle me-1"></i> ปฏิเสธ
+              </span>
+              {% endif %}
+            </td>
+            {% if is_admin or user == tournament.created_by or user.is_superuser or user.is_staff or user.profile.role == 'tournament_admin' %}
+            <td style="padding:12px 14px;text-align:center;">
+              <div style="display:inline-flex;gap:6px;">
+                {% if reg.status != 'approved' %}
+                <a href="{% url 'approve_registration' tournament.pk reg.id %}" onclick="return confirm('อนุมัติทีม {{ reg.team.name }} เข้าร่วมการแข่งขัน?');"
+                  style="padding:4px 10px;background:#28a745;color:white;text-decoration:none;border-radius:4px;font-size:0.8rem;white-space:nowrap;">
+                  <i class="fas fa-check"></i> อนุมัติ
+                </a>
+                {% endif %}
+                {% if reg.status != 'rejected' %}
+                <a href="{% url 'reject_registration' tournament.pk reg.id %}" onclick="return confirm('ปฏิเสธทีม {{ reg.team.name }}?');"
+                  style="padding:4px 10px;background:#ffc107;color:#000;text-decoration:none;border-radius:4px;font-size:0.8rem;white-space:nowrap;">
+                  <i class="fas fa-times"></i> ปฏิเสธ
+                </a>
+                {% endif %}
+              </div>
+            </td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p style="color:#aaa;font-style:italic;margin-bottom:24px;">ยังไม่มีทีมสมัครเข้าร่วมรายการนี้</p>
+    {% endif %}
+  </div>
+
   <div>
     <div style="display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;">
-      {% if user == tournament.created_by or user.is_superuser %}
+      {% if is_admin or user == tournament.created_by or user.is_superuser or user.is_staff or user.profile.role == 'tournament_admin' %}
       <a href="{% url 'manage_matches' tournament.pk %}" class="btn btn-warning" style="width:auto;"><i class="fas fa-edit"></i>
         จัดการผลการแข่งขัน</a>
-      <a href="{% url 'tournament_start' tournament.pk %}" class="btn btn-success" style="width:auto;"><i class="fas fa-play"></i>
+      {% if approved_count >= 2 %}
+      <a href="{% url 'tournament_start' tournament.pk %}" class="btn btn-success" style="width:auto;" onclick="return confirm('ยืนยันเริ่มการแข่งขันและจับคู่สายการแข่งขัน?');"><i class="fas fa-play"></i>
         เริ่มการแข่งขัน</a>
+      {% else %}
+      <button class="btn btn-secondary" style="width:auto;opacity:0.6;cursor:not-allowed;" title="ต้องมีทีมที่อนุมัติแล้วอย่างน้อย 2 ทีม" disabled><i class="fas fa-play"></i>
+        เริ่มการแข่งขัน (รออนุมัติทีม ≥ 2)</button>
+      {% endif %}
       {% if tournament.status == 'finished' or tournament.status == 'closed' or tournament.status == 'draft' %}
       <form action="{% url 'tournament_delete' tournament.pk %}" method="POST" style="display:inline;" onsubmit="return confirm('คุณต้องการลบการแข่งขันนี้ใช่หรือไม่? การกระทำนี้ไม่สามารถยกเลิกได้');">
         {% csrf_token %}
@@ -39,8 +129,10 @@
         ตารางแข่ง</a>
       <a href="{% url 'tournament_standings' tournament.pk %}" class="btn btn-info" style="width:auto;"><i class="fas fa-list-ol"></i>
         ตารางคะแนน</a>
+      {% if tournament.status == 'open' %}
       <a href="{% url 'tournament_create_team_register' tournament.pk %}" class="btn btn-primary" style="width:auto;"><i
           class="fas fa-user-plus"></i> สมัครแข่ง</a>
+      {% endif %}
     </div>
   </div>
 </div>

@@ -97,18 +97,77 @@ def tournament_register_view(request, pk):
         # create registration if not already registered
         existing = TournamentRegistration.objects.filter(tournament=tournament, team=team).first()
         if not existing:
-            TournamentRegistration.objects.create(tournament=tournament, team=team, status='approved')
+            TournamentRegistration.objects.create(tournament=tournament, team=team, status='pending')
+            messages.success(request, f'ส่งคำขอสมัครทีม {team.name} เรียบร้อยแล้ว รอผู้ดูแลอนุมัติ')
+        else:
+            messages.info(request, f'ทีม {team.name} ได้ลงทะเบียนรายการนี้ไว้แล้ว')
 
-        # redirect to home (or you can create a tournament detail page)
-        return redirect('home')
+        # redirect to tournament detail page
+        return redirect('tournament_detail', pk=pk)
 
     return render(request, 'tournaments/register.html', {'tournament': tournament})
 
 
+def is_tournament_admin(user, tournament=None):
+    """Check if user has admin privileges for tournaments (superuser, staff, tournament_admin role, or tournament creator)."""
+    if not user.is_authenticated:
+        return False
+    if user.is_superuser or user.is_staff:
+        return True
+    if hasattr(user, 'profile') and user.profile.role == 'tournament_admin':
+        return True
+    if tournament and tournament.created_by_id == user.id:
+        return True
+    return False
+
+
 def tournament_detail_view(request, pk):
-    """Show tournament rules and featured description with register button."""
+    """Show tournament rules and featured description with register button and registered teams list."""
     tournament = get_object_or_404(Tournament, pk=pk)
-    return render(request, 'tournaments/detail.html', {'tournament': tournament})
+    is_admin = is_tournament_admin(request.user, tournament)
+
+    registrations = tournament.registrations.select_related('team', 'team__created_by').prefetch_related('team__members').order_by('-registered_at')
+    approved_count = registrations.filter(status='approved').count()
+
+    return render(request, 'tournaments/detail.html', {
+        'tournament': tournament,
+        'is_admin': is_admin,
+        'registrations': registrations,
+        'approved_count': approved_count
+    })
+
+
+@login_required
+def approve_registration_view(request, pk, reg_id):
+    """Admin only: Approve a specific team's registration for this tournament."""
+    from django.utils import timezone
+    tournament = get_object_or_404(Tournament, pk=pk)
+    if not is_tournament_admin(request.user, tournament):
+        messages.error(request, 'คุณไม่มีสิทธิ์ในการอนุมัติทีม')
+        return redirect('tournament_detail', pk=pk)
+
+    registration = get_object_or_404(TournamentRegistration, pk=reg_id, tournament=tournament)
+    registration.status = 'approved'
+    registration.approved_by = request.user
+    registration.approved_at = timezone.now()
+    registration.save()
+    messages.success(request, f'อนุมัติทีม {registration.team.name} เรียบร้อยแล้ว')
+    return redirect('tournament_detail', pk=pk)
+
+
+@login_required
+def reject_registration_view(request, pk, reg_id):
+    """Admin only: Reject a specific team's registration for this tournament."""
+    tournament = get_object_or_404(Tournament, pk=pk)
+    if not is_tournament_admin(request.user, tournament):
+        messages.error(request, 'คุณไม่มีสิทธิ์ในการปฏิเสธทีม')
+        return redirect('tournament_detail', pk=pk)
+
+    registration = get_object_or_404(TournamentRegistration, pk=reg_id, tournament=tournament)
+    registration.status = 'rejected'
+    registration.save()
+    messages.warning(request, f'ปฏิเสธทีม {registration.team.name} เรียบร้อยแล้ว')
+    return redirect('tournament_detail', pk=pk)
 
 
 @login_required
@@ -117,9 +176,7 @@ def delete_tournament_view(request, pk):
     tournament = get_object_or_404(Tournament, pk=pk)
     
     # Check permission
-    is_admin = request.user.is_superuser or request.user.is_staff or request.user == tournament.created_by
-    if hasattr(request.user, 'profile'):
-        is_admin = is_admin or request.user.profile.role == 'tournament_admin'
+    is_admin = is_tournament_admin(request.user, tournament)
         
     if not is_admin:
         messages.error(request, 'คุณไม่มีสิทธิ์ลบการแข่งขัน')
@@ -173,11 +230,11 @@ def create_team_and_register(request, pk):
         # create TeamMember record with leader role
         TeamMember.objects.create(team=team, user=request.user, role_in_team='leader', status='accepted')
 
-        # create registration
-        TournamentRegistration.objects.create(tournament=tournament, team=team, status='approved')
+        # create registration as pending for admin approval
+        TournamentRegistration.objects.create(tournament=tournament, team=team, status='pending')
 
-        messages.success(request, 'สร้างทีมและสมัครเรียบร้อยแล้ว')
-        return redirect('home')
+        messages.success(request, 'สร้างทีมและส่งคำขอสมัครเรียบร้อยแล้ว รอผู้ดูแลอนุมัติการเข้าร่วม')
+        return redirect('tournament_detail', pk=pk)
 
     return render(request, 'tournaments/create_team.html', {'tournament': tournament})
 
@@ -242,7 +299,7 @@ def start_tournament_view(request, pk):
     tournament = get_object_or_404(Tournament, pk=pk)
     
     # Check permission
-    if request.user != tournament.created_by and not request.user.is_superuser:
+    if not is_tournament_admin(request.user, tournament):
         messages.error(request, "คุณไม่มีสิทธิ์เริ่มการแข่งขันนี้")
         return redirect('tournament_detail', pk=pk)
         
@@ -349,7 +406,7 @@ def manage_matches_view(request, pk):
     tournament = get_object_or_404(Tournament, pk=pk)
     
     # Check permission
-    if request.user != tournament.created_by and not request.user.is_superuser:
+    if not is_tournament_admin(request.user, tournament):
         messages.error(request, "คุณไม่มีสิทธิ์จัดการผลการแข่งขันนี้")
         return redirect('tournament_detail', pk=pk)
 
@@ -550,7 +607,7 @@ def swap_teams_view(request, pk):
     tournament = get_object_or_404(Tournament, pk=pk)
     
     # Check permission
-    if request.user != tournament.created_by and not request.user.is_superuser:
+    if not is_tournament_admin(request.user, tournament):
         messages.error(request, "คุณไม่มีสิทธิ์จัดการการแข่งขันนี้")
         return redirect('tournament_bracket', pk=pk)
 

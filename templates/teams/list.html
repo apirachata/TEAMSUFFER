@@ -21,14 +21,14 @@
   </div>
 
   <div style="background:rgba(0,0,0,0.12);padding:14px;border-radius:10px;color:#ddd;overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%;">
-    <table style="width:100%;min-width:550px;border-collapse:collapse">
+    <table style="width:100%;min-width:650px;border-collapse:collapse">
       <thead>
         <tr style="text-align:left;color:#9fb6ff">
           <th style="padding:10px 12px">ชื่อทีม</th>
           <th style="padding:10px 12px;width:180px">รายการแข่ง</th>
           <th style="padding:10px 12px;width:120px">จำนวนสมาชิก</th>
-          <th style="padding:10px 12px;width:100px">สถานะ</th>
-          <th style="padding:10px 12px;width:150px"></th>
+          <th style="padding:10px 12px;width:130px">สถานะการแข่งขัน</th>
+          <th style="padding:10px 12px;width:160px;text-align:center;">จัดการ</th>
         </tr>
       </thead>
       <tbody id="teamsTable">
@@ -51,36 +51,64 @@
             <span style="color:#666">-</span>
             {% endif %}
           </td>
-          <td style="padding:12px">{{ team.member_count }} / 6</td>
-          <td style="padding:12px">{% if team.member_count|default:0 < 6 %}เปิดรับ{% else %}เต็ม{% endif %}</td>
           <td style="padding:12px">
-            {% if request.user.is_superuser %}
+            {{ team.member_count }} / 6
+            {% if team.member_count|default:0 < 6 %}
+            <span style="color:#28a745;font-size:0.75rem;display:block;">(เปิดรับ)</span>
+            {% else %}
+            <span style="color:#aaa;font-size:0.75rem;display:block;">(เต็ม)</span>
+            {% endif %}
+          </td>
+          <td style="padding:12px">
+            {% if team.registration_status == 'approved' %}
+            <span style="display:inline-block;padding:4px 8px;border-radius:6px;background:rgba(40,167,69,0.2);color:#28a745;border:1px solid rgba(40,167,69,0.4);font-size:0.85rem;font-weight:bold;">
+              <i class="fas fa-check-circle me-1"></i> อนุมัติแล้ว
+            </span>
+            {% elif team.registration_status == 'pending' %}
+            <span style="display:inline-block;padding:4px 8px;border-radius:6px;background:rgba(255,193,7,0.2);color:#ffc107;border:1px solid rgba(255,193,7,0.4);font-size:0.85rem;font-weight:bold;">
+              <i class="fas fa-clock me-1"></i> รอการอนุมัติ
+            </span>
+            {% elif team.registration_status == 'rejected' %}
+            <span style="display:inline-block;padding:4px 8px;border-radius:6px;background:rgba(220,53,69,0.2);color:#dc3545;border:1px solid rgba(220,53,69,0.4);font-size:0.85rem;font-weight:bold;">
+              <i class="fas fa-times-circle me-1"></i> ปฏิเสธแล้ว
+            </span>
+            {% else %}
+            <span style="color:#666">-</span>
+            {% endif %}
+          </td>
+          <td style="padding:12px;text-align:center;">
+            {% if is_admin or request.user.is_superuser or request.user.is_staff or request.user.profile.role == 'tournament_admin' %}
             <!-- Admin sees approve/reject/delete buttons -->
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <div style="display: flex; gap: 6px; justify-content: center; flex-wrap: wrap;">
+              {% if team.registration_status == 'pending' or team.registration_status == 'rejected' %}
               <a href="{% url 'approve_team' team.id %}" onclick="return confirm('อนุมัติทีม {{ team.name }}?');"
-                style="padding:6px 12px;background:#28a745;color:white;text-decoration:none;border-radius:6px;font-size:0.85rem;white-space:nowrap;">
-                อนุมัติ
+                style="padding:5px 10px;background:#28a745;color:white;text-decoration:none;border-radius:6px;font-size:0.8rem;white-space:nowrap;">
+                <i class="fas fa-check"></i> อนุมัติ
               </a>
+              {% endif %}
+              {% if team.registration_status == 'pending' or team.registration_status == 'approved' %}
               <a href="{% url 'reject_team' team.id %}" onclick="return confirm('ปฏิเสธทีม {{ team.name }}?');"
-                style="padding:6px 12px;background:#ffc107;color:#000;text-decoration:none;border-radius:6px;font-size:0.85rem;white-space:nowrap;">
-                ปฏิเสธ
+                style="padding:5px 10px;background:#ffc107;color:#000;text-decoration:none;border-radius:6px;font-size:0.8rem;white-space:nowrap;">
+                <i class="fas fa-times"></i> ปฏิเสธ
               </a>
+              {% endif %}
               <a href="{% url 'delete_team' team.id %}" onclick="return confirm('ยืนยันลบทีม {{ team.name }}?');"
-                style="padding:6px 12px;background:#dc3545;color:white;text-decoration:none;border-radius:6px;font-size:0.85rem;white-space:nowrap;">
-                ลบ
+                style="padding:5px 10px;background:#dc3545;color:white;text-decoration:none;border-radius:6px;font-size:0.8rem;white-space:nowrap;">
+                <i class="fas fa-trash"></i> ลบ
               </a>
             </div>
             {% else %}
             <!-- Regular users see join button -->
-            {% if team.member_count|default:0 < 6 %} <form method="post" style="display:inline">
+            {% if team.member_count|default:0 < 6 %}
+            <form method="post" style="display:inline">
               {% csrf_token %}
               <input type="hidden" name="team_id" value="{{ team.id }}">
-              <button class="btn btn-primary" type="submit" style="padding:6px 14px">เข้าร่วม</button>
-              </form>
-              {% else %}
-              <span style="color:#999">เต็มแล้ว</span>
-              {% endif %}
-              {% endif %}
+              <button class="btn btn-primary" type="submit" style="padding:6px 14px;font-size:0.85rem;">เข้าร่วม</button>
+            </form>
+            {% else %}
+            <span style="color:#999;font-size:0.85rem;">เต็มแล้ว</span>
+            {% endif %}
+            {% endif %}
           </td>
         </tr>
         {% empty %}

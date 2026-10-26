@@ -313,6 +313,23 @@
           </div>
           {% endfor %}
         </div>
+
+        <!-- Team Actions for Current User -->
+        <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+          {% if team.created_by == request.user %}
+          <a href="{% url 'disband_team' team.id %}" class="btn btn-sm btn-outline-danger"
+            onclick="return confirm('ยืนยันยุบทีม {{ team.name }}? สมาชิกทุกคนจะออกจากทีมและการลงทะเบียนแข่งขันจะถูกยกเลิก');"
+            style="padding: 6px 14px; font-size: 0.85rem; border: 1px solid #dc3545; color: #dc3545; text-decoration: none; border-radius: 6px;">
+            <i class="fas fa-trash-alt me-1"></i> ยุบทีม
+          </a>
+          {% elif user_team_member and user_team_member.role_in_team != 'leader' %}
+          <a href="{% url 'leave_team' %}" class="btn btn-sm btn-outline-warning"
+            onclick="return confirm('ยืนยันออกจากทีม {{ team.name }}?');"
+            style="padding: 6px 14px; font-size: 0.85rem; border: 1px solid #ffc107; color: #ffc107; text-decoration: none; border-radius: 6px;">
+            <i class="fas fa-sign-out-alt me-1"></i> ออกจากทีม
+          </a>
+          {% endif %}
+        </div>
       </div>
       {% else %}
       <p style="color: #bbb; padding: 20px 0;">คุณยังไม่มีทีม <a href="{% url 'teams_frontend' %}"

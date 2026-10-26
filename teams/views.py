@@ -36,6 +36,17 @@ class TeamMemberRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIVi
     permission_classes = [permissions.IsAuthenticated]
 
 
+def is_admin_user(user):
+    """Check if a user has admin privileges (superuser, staff, or tournament_admin role)."""
+    if not user.is_authenticated:
+        return False
+    if user.is_superuser or user.is_staff:
+        return True
+    if hasattr(user, 'profile') and user.profile.role == 'tournament_admin':
+        return True
+    return False
+
+
 def teams_frontend_list(request):
     """Frontend: list teams (public) and allow joining directly (login required for POST)."""
     teams = Team.objects.filter(status='active').annotate(member_count=Count('members')).order_by('-created_at')
@@ -76,15 +87,26 @@ def teams_frontend_list(request):
     from tournaments.models import Tournament, TournamentRegistration
     tournaments = Tournament.objects.filter(status__in=['open', 'ongoing']).order_by('-start_date')
     
-    # Add tournament info to each team
-    team_tournament_map = {}
-    for reg in TournamentRegistration.objects.select_related('team', 'tournament').filter(team__in=teams):
-        team_tournament_map[reg.team_id] = reg.tournament.name
+    # Add tournament and registration status info to each team
+    team_reg_map = {}
+    for reg in TournamentRegistration.objects.select_related('team', 'tournament').filter(team__in=teams).order_by('-registered_at'):
+        if reg.team_id not in team_reg_map:
+            team_reg_map[reg.team_id] = reg
     
     for team in teams:
-        team.tournament_name = team_tournament_map.get(team.id, '')
+        reg = team_reg_map.get(team.id)
+        team.tournament_name = reg.tournament.name if reg else ''
+        team.registration_status = reg.status if reg else ''
+        team.registration_id = reg.id if reg else None
 
-    return render(request, 'teams/list.html', {'teams': teams, 'games': games, 'tournaments': tournaments})
+    is_admin = is_admin_user(request.user)
+
+    return render(request, 'teams/list.html', {
+        'teams': teams, 
+        'games': games, 
+        'tournaments': tournaments,
+        'is_admin': is_admin
+    })
 
 
 @login_required
@@ -93,17 +115,16 @@ def remove_team_member_view(request, pk):
     member = get_object_or_404(TeamMember, pk=pk)
     team = member.team
 
-    # Check if request.user is the leader of this team
-    # Find the membership of the request.user in this team
+    # Check if request.user is the leader of this team or admin
     is_leader = TeamMember.objects.filter(team=team, user=request.user, role_in_team='leader').exists()
 
-    if not is_leader:
+    if not is_leader and not is_admin_user(request.user):
         messages.error(request, 'คุณไม่ใช่หัวหน้าทีมนี้')
         return redirect('account_profile')
 
-    # Prevent removing self (Leader cannot kick self, must disband or transfer - for now just prevent)
+    # Prevent removing self (Leader cannot kick self, must disband or transfer)
     if member.user == request.user:
-        messages.error(request, 'ไม่สามารถลบตัวเองได้')
+        messages.error(request, 'ไม่สามารถลบตัวเองได้ กรุณาใช้ปุ่มยุบทีม')
         return redirect('account_profile')
 
     # Perform deletion
@@ -114,9 +135,41 @@ def remove_team_member_view(request, pk):
 
 
 @login_required
+def leave_team_view(request):
+    """Allow a regular member to leave their current team."""
+    membership = TeamMember.objects.filter(user=request.user).first()
+    if not membership:
+        messages.error(request, 'คุณไม่ได้อยู่ในทีมใด')
+        return redirect('account_profile')
+
+    if membership.role_in_team == 'leader':
+        messages.error(request, 'หัวหน้าทีมไม่สามารถออกจากทีมได้ กรุณายุบทีมแทน')
+        return redirect('account_profile')
+
+    team_name = membership.team.name
+    membership.delete()
+    messages.success(request, f'คุณออกจากทีม {team_name} เรียบร้อยแล้ว')
+    return redirect('account_profile')
+
+
+@login_required
+def disband_team_view(request, pk):
+    """Allow team leader (or admin) to disband the team."""
+    team = get_object_or_404(Team, pk=pk)
+    if team.created_by != request.user and not is_admin_user(request.user):
+        messages.error(request, 'คุณไม่มีสิทธิ์ในการยุบทีมนี้')
+        return redirect('account_profile')
+
+    team_name = team.name
+    team.delete()
+    messages.success(request, f'ยุบทีม {team_name} เรียบร้อยแล้ว')
+    return redirect('account_profile')
+
+
+@login_required
 def delete_team_view(request, pk):
     """Admin only: Delete a team."""
-    if not request.user.is_superuser:
+    if not is_admin_user(request.user):
         messages.error(request, 'คุณไม่มีสิทธิ์ในการลบทีม')
         return redirect('teams_frontend')
 
@@ -133,24 +186,34 @@ def approve_team_view(request, pk):
     from tournaments.models import TournamentRegistration
     from django.utils import timezone
     
-    if not request.user.is_superuser:
+    team = get_object_or_404(Team, pk=pk)
+    
+    # Find pending or rejected registration to approve
+    registration = TournamentRegistration.objects.filter(team=team, status__in=['pending', 'rejected']).order_by('-registered_at').first()
+    
+    if not registration:
+        # Check if already approved
+        already_approved = TournamentRegistration.objects.filter(team=team, status='approved').first()
+        if already_approved:
+            messages.info(request, f'ทีม {team.name} ได้รับการอนุมัติอยู่แล้ว')
+        else:
+            messages.info(request, f'ไม่พบการลงทะเบียนที่รอการอนุมัติสำหรับทีม {team.name}')
+        referer = request.META.get('HTTP_REFERER')
+        return redirect(referer if referer else 'teams_frontend')
+
+    # Check permission: admin or tournament creator
+    if not (is_admin_user(request.user) or request.user == registration.tournament.created_by):
         messages.error(request, 'คุณไม่มีสิทธิ์ในการอนุมัติทีม')
         return redirect('teams_frontend')
 
-    # Find the team's pending registration
-    team = get_object_or_404(Team, pk=pk)
-    registration = TournamentRegistration.objects.filter(team=team, status='pending').first()
+    registration.status = 'approved'
+    registration.approved_by = request.user
+    registration.approved_at = timezone.now()
+    registration.save()
+    messages.success(request, f'อนุมัติทีม {team.name} เข้าร่วมการแข่งขัน {registration.tournament.name} เรียบร้อยแล้ว')
     
-    if registration:
-        registration.status = 'approved'
-        registration.approved_by = request.user
-        registration.approved_at = timezone.now()
-        registration.save()
-        messages.success(request, f'อนุมัติทีม {team.name} เรียบร้อยแล้ว')
-    else:
-        messages.info(request, f'ไม่พบการลงทะเบียนที่รอการอนุมัติสำหรับทีม {team.name}')
-    
-    return redirect('teams_frontend')
+    referer = request.META.get('HTTP_REFERER')
+    return redirect(referer if referer else 'teams_frontend')
 
 
 @login_required
@@ -158,21 +221,24 @@ def reject_team_view(request, pk):
     """Admin only: Reject a team's tournament registration."""
     from tournaments.models import TournamentRegistration
     
-    if not request.user.is_superuser:
+    team = get_object_or_404(Team, pk=pk)
+    registration = TournamentRegistration.objects.filter(team=team, status__in=['pending', 'approved']).order_by('-registered_at').first()
+    
+    if not registration:
+        messages.info(request, f'ไม่พบการลงทะเบียนสำหรับทีม {team.name}')
+        referer = request.META.get('HTTP_REFERER')
+        return redirect(referer if referer else 'teams_frontend')
+
+    if not (is_admin_user(request.user) or request.user == registration.tournament.created_by):
         messages.error(request, 'คุณไม่มีสิทธิ์ในการปฏิเสธทีม')
         return redirect('teams_frontend')
 
-    team = get_object_or_404(Team, pk=pk)
-    registration = TournamentRegistration.objects.filter(team=team, status='pending').first()
+    registration.status = 'rejected'
+    registration.save()
+    messages.warning(request, f'ปฏิเสธทีม {team.name} จากการแข่งขัน {registration.tournament.name} เรียบร้อยแล้ว')
     
-    if registration:
-        registration.status = 'rejected'
-        registration.save()
-        messages.success(request, f'ปฏิเสธทีม {team.name} เรียบร้อยแล้ว')
-    else:
-        messages.info(request, f'ไม่พบการลงทะเบียนที่รอการอนุมัติสำหรับทีม {team.name}')
-    
-    return redirect('teams_frontend')
+    referer = request.META.get('HTTP_REFERER')
+    return redirect(referer if referer else 'teams_frontend')
 
 
 @login_required
