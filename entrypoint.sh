@@ -15,5 +15,6 @@ if [ -n "$DJANGO_SUPERUSER_USERNAME" ] && [ -n "$DJANGO_SUPERUSER_EMAIL" ] && [ 
 fi
 
 # Start server
-echo "Starting server..."
-exec gunicorn teamsuffer.wsgi:application --bind 0.0.0.0:8000 --workers 3
+PORT="${PORT:-8000}"
+echo "Starting server on port $PORT..."
+exec gunicorn teamsuffer.wsgi:application --bind "0.0.0.0:$PORT" --workers 3
