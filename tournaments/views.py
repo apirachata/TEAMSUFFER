@@ -340,7 +340,8 @@ def tournament_bracket_view(request, pk):
         'rounds': sorted_rounds, 
         'matches': matches,
         'show_standings': show_standings,
-        'teams': teams
+        'teams': teams,
+        'is_admin': is_tournament_admin(request.user, tournament),
     })
 
 
@@ -351,7 +352,7 @@ def tournament_standings_view(request, pk):
     """
     tournament = get_object_or_404(Tournament, pk=pk)
     
-    is_admin = request.user.is_authenticated and (request.user == tournament.created_by or request.user.is_superuser)
+    is_admin = is_tournament_admin(request.user, tournament)
     
     if request.method == 'POST' and is_admin:
         # Inline save logic

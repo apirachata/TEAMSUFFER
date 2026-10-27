@@ -112,11 +112,15 @@
       <a href="{% url 'manage_matches' tournament.pk %}" class="btn btn-warning" style="width:auto;"><i class="fas fa-edit"></i>
         จัดการผลการแข่งขัน</a>
       {% if approved_count >= 2 %}
-      <a href="{% url 'tournament_start' tournament.pk %}" class="btn btn-success" style="width:auto;" onclick="return confirm('ยืนยันเริ่มการแข่งขันและจับคู่สายการแข่งขัน?');"><i class="fas fa-play"></i>
-        เริ่มการแข่งขัน</a>
+      <a href="{% url 'tournament_start' tournament.pk %}" class="btn btn-success" 
+        style="width:auto; background: linear-gradient(135deg, #28a745, #20c997); color: white; font-weight: bold; border: none; box-shadow: 0 4px 12px rgba(40,167,69,0.4); display:inline-flex; align-items:center; gap:6px;" 
+        onclick="return confirm('ยืนยันเริ่มการแข่งขันและจับคู่สายการแข่งขัน?');">
+        <i class="fas fa-play"></i> เริ่มการแข่งขัน (สร้างสายแข่ง)
+      </a>
       {% else %}
-      <button class="btn btn-secondary" style="width:auto;opacity:0.6;cursor:not-allowed;" title="ต้องมีทีมที่อนุมัติแล้วอย่างน้อย 2 ทีม" disabled><i class="fas fa-play"></i>
-        เริ่มการแข่งขัน (รออนุมัติทีม ≥ 2)</button>
+      <button class="btn btn-secondary" style="width:auto; opacity:0.6; cursor:not-allowed; display:inline-flex; align-items:center; gap:6px;" title="ต้องมีทีมที่อนุมัติแล้วอย่างน้อย 2 ทีม" disabled>
+        <i class="fas fa-play"></i> เริ่มการแข่งขัน (รออนุมัติทีม ≥ 2)
+      </button>
       {% endif %}
       {% if tournament.status == 'finished' or tournament.status == 'closed' or tournament.status == 'draft' %}
       <form action="{% url 'tournament_delete' tournament.pk %}" method="POST" style="display:inline;" onsubmit="return confirm('คุณต้องการลบการแข่งขันนี้ใช่หรือไม่? การกระทำนี้ไม่สามารถยกเลิกได้');">

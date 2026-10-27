@@ -260,13 +260,12 @@
       </div>
 
       <div class="d-flex gap-2">
-        {% if user == tournament.created_by or user.is_superuser %}
-        {% if tournament.status == 'draft' or tournament.status == 'open' or tournament.status == 'closed' %}
+        {% if is_admin or user == tournament.created_by or user.is_superuser or user.is_staff or user.profile.role == 'tournament_admin' %}
         <a href="{% url 'tournament_start' tournament.pk %}" class="action-btn"
+          style="background: linear-gradient(135deg, #28a745, #20c997); color: white; border: none; padding: 8px 18px; border-radius: 20px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;"
           onclick="return confirm('การสุ่มสายใหม่จะลบข้อมูลการแข่งขันเดิมทั้งหมด ยืนยันหรือไม่?');">
-          <i class="fas fa-random"></i> Generate
+          <i class="fas fa-random"></i> {% if matches %}Generate ใหม่{% else %}Generate สายแข่ง{% endif %}
         </a>
-        {% endif %}
         <button type="button" class="outline-btn" data-bs-toggle="modal" data-bs-target="#swapTeamsModal">
           <i class="fas fa-exchange-alt"></i> Swap Teams
         </button>
@@ -335,17 +334,26 @@
   </div>
   {% else %}
   <!-- Empty State -->
-  <div class="empty-state">
-    <i class="fas fa-project-diagram fa-3x mb-4 text-secondary"></i>
-    <h3>ยังไม่มีสายการแข่งขัน</h3>
-    <p class="text-muted">กรุณากด Generate เพื่อสร้างสายการแข่งขัน</p>
+  <div class="empty-state" style="text-align: center; padding: 60px 20px;">
+    <i class="fas fa-project-diagram fa-3x mb-3 text-secondary" style="opacity: 0.6;"></i>
+    <h3 style="color: #fff; font-weight: 600; margin-bottom: 10px;">ยังไม่มีสายการแข่งขัน</h3>
+    <p class="text-muted" style="margin-bottom: 24px;">กรุณากดปุ่มด้านล่างเพื่อสุ่มจับคู่และสร้างสายการแข่งขัน (ต้องการทีมที่อนุมัติแล้วอย่างน้อย 2 ทีม)</p>
+    {% if is_admin or user == tournament.created_by or user.is_superuser or user.is_staff or user.profile.role == 'tournament_admin' %}
+    <div>
+      <a href="{% url 'tournament_start' tournament.pk %}" class="btn btn-success"
+        style="background: linear-gradient(135deg, #28a745, #20c997); color: white; padding: 12px 28px; border-radius: 8px; font-weight: bold; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.4);"
+        onclick="return confirm('ยืนยันสร้างสายการแข่งขันและสุ่มคู่แข่งขัน?');">
+        <i class="fas fa-random"></i> สร้างสายการแข่งขัน (Generate Bracket)
+      </a>
+    </div>
+    {% endif %}
   </div>
   {% endif %}
 
 </div>
 
 <!-- Context Menu / Modal for Swap -->
-{% if user == tournament.created_by or user.is_superuser %}
+{% if is_admin or user == tournament.created_by or user.is_superuser or user.is_staff or user.profile.role == 'tournament_admin' %}
 <div class="modal fade" id="swapTeamsModal" tabindex="-1" aria-labelledby="swapTeamsModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content" style="background: #1a1a2e; border: 1px solid rgba(255,255,255,0.1); color: #fff;">
